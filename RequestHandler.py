@@ -1,5 +1,8 @@
 import socketserver
 
+# TODO: add board formatting
+# TODO: add response sending
+
 
 def as_bytes(string):
     return string.encode("UTF-8")
@@ -9,10 +12,18 @@ def as_string(data):
     return data.decode("UTF-8")
 
 
+class MessageParseException(BaseException):
+    pass
+
+
+class UnknownMessageException(BaseException):
+    pass
+
+
 class StartMessage(object):
     def __init__(self, *args):
         if len(args) != 1:
-            raise Error()
+            raise MessageParseException("Unable to parse `Start` message")
         self.position = args[0]
 
     def __str__(self):
@@ -22,7 +33,7 @@ class StartMessage(object):
 class ChangeMessage(object):
     def __init__(self, *args):
         if len(args) != 3:
-            raise Error()
+            raise MessageParseException("Unable to parse `Change` message")
         self.moveswap = args[0]
         self.state = args[1]
         self.turn = args[2]
@@ -52,7 +63,7 @@ class InputParser(object):
         message = InputParser.message_types[self.message_type]
 
         if not message:
-            raise Error()
+            raise UnknownMessageException("Unrecognized message {}".format(self.message_type))
 
         return message(*self.args)
 
