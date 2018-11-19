@@ -39,7 +39,8 @@ class ChangeMessage(object):
         self.turn = args[2]
 
     def __str__(self):
-        return "CHANGE (moveswap={}, state={}, turn={})".format(self.moveswap, self.state, self.turn)
+        return "CHANGE (moveswap={}, state={}, turn={})".format(
+            self.moveswap, self.state, self.turn)
 
 
 class EndMessage(object):
@@ -63,7 +64,8 @@ class InputParser(object):
         message = InputParser.message_types[self.message_type]
 
         if not message:
-            raise UnknownMessageException("Unrecognized message {}".format(self.message_type))
+            raise UnknownMessageException(
+                "Unrecognized message {}".format(self.message_type))
 
         return message(*self.args)
 
