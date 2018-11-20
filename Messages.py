@@ -14,13 +14,13 @@ def as_row(stones):
     return row_template.format(*stones)
 
 
-def csv_as_list(csv):
+def csv_as_int_list(csv):
     """Returns a comma seperated value as a list
 
     Arguments:
     csv -- comma separated value eg '1,2,3,4,5'
     """
-    return [int(i) for i in csv.split(',')]
+    return [int(i) for i in csv.split(',') if i.isdigit()]
 
 
 class StartMessage(object):
