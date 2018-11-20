@@ -20,7 +20,7 @@ def csv_as_list(csv):
     Arguments:
     csv -- comma separated value eg '1,2,3,4,5'
     """
-    return [int(i) for i in args[1].split(',')]
+    return [int(i) for i in csv.split(',')]
 
 
 class StartMessage(object):
