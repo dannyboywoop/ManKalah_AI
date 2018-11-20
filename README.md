@@ -17,13 +17,22 @@ Run game engine:
 
 The following message should appear on your `RequestHandler.py` console:
 ```
-Recv: b'START;South' # Raw Message from game engine
+New connection accepted.
+Recv: START;South # Raw Message from game engine
 START(position=South) # Parsed object
 ```
-You can now type out responses and press enter, for example:
+Currently, you cannot respond to this. To view a state, you will need to go second.
 
+```java -jar ManKalah.jar "java -jar MKRefAgent.jar" "nc localhost 12346"```
+
+Which should give you the following output:
 ```
-MOVE;1 # My response
-Recv: b'CHANGE;1;7,7,7,7,7,7,7,0,0,8,8,8,8,8,8,1;OPP' # Raw change message
-CHANGE (moveswap=1, state=7,7,7,7,7,7,7,0,0,8,8,8,8,8,8,1, turn=OPP) # parsed object
+New connection accepted.
+Recv: START;North
+START(position=North)
+Recv: CHANGE;1;7,7,7,7,7,7,7,0,0,8,8,8,8,8,8,1;YOU
+     [ 7][ 7][ 7][ 7][ 7][ 7][ 7]
+[ 0]                                 [ 1]
+     [ 0][ 8][ 8][ 8][ 8][ 8][ 8]
+
 ```
