@@ -46,7 +46,7 @@ class ChangeMessage(object):
     def pretty_board(self):
         """Returns `state` as a 'pretty' board"""
         north_score, south_score = self.state[7], self.state[15]
-        north_seeds = self.state[0:7]
+        north_seeds = self.state[6::-1]  # first 7 seeds in reverse order
         south_seeds = self.state[8:15]
 
         # format data into 'pretty' rows
