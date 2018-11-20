@@ -9,12 +9,13 @@ class gameState:
     }
     
     # sets up game board and selects South as the first player
-    def __init__(self, seeds, holes):
+    def __init__(self, holes=7, seeds=7):
         self.seeds = seeds
         self.holes = holes
         self.board = [seeds]*holes + [0] + [seeds]*holes + [0]
         self.currentPlayer = "South"
         self.gameOver = False
+        self.firstTurn = True
         self.scoreSlots = [self.holes, 2 * self.holes + 1]
         return
     
@@ -25,13 +26,24 @@ class gameState:
       
     # return index of current players score slot
     def playersScoreSlot(self):
-        return self.scoreSlots[self.currentPlayer]
+        return self.scoreSlots[self.players[self.currentPlayer]]
     
     # converts a player's slot number [1-7] into a board index
-    def slotIndex(self, slot):
-        if (slot<0 or slot>self.holes):
+    def slotIndex(self, slot, player = None):
+        if (player == None):
+            player = self.currentPlayer
+        if (slot<1 or slot>self.holes):
             raise Exception("Index out of range")
-        return self.players[self.currentPlayer]*self.holes+1 + slot - 1
+        return self.players[player]*(self.holes+1) + slot - 1
+
+    # given the name of one player, returns the name of the other
+    def otherPlayer(self, player = None):
+        if (player == None):
+            player = self.currentPlayer
+        if player == "North":
+            return "South"
+        if player == "South":
+            return "North"
 
     # clone server state
     def cloneServerState(self, board, currentPlayer):
@@ -51,7 +63,7 @@ class gameState:
                 moves += [i]
         return moves
     
-    # returns a tuple of player scores: (player 1's score, player 2's score)
+    # returns a tuple of player scores: (North's score, South's score)
     def Scores(self):
         return self.board[self.scoreSlots[0]],self.board[self.scoreSlots[1]]
     
@@ -61,12 +73,15 @@ class gameState:
         selectedPos = self.slotIndex(pos)
         
         # get number of seeds in selected slot there's atleast 1
-        numOfSeeds = self.board(selectedPos)
+        numOfSeeds = self.board[selectedPos]
         if (numOfSeeds < 1):
             raise Exception("Not a legal move!")
         
         # create a new state as a deep copy of the current one
         newState = copy.deepcopy(self)
+        
+        # take seeds from selected hole
+        newState.board[selectedPos] = 0
         
         # place seeds in subsequent slots (ignoring opponents score slot)
         while (numOfSeeds>0):
@@ -78,10 +93,19 @@ class gameState:
             
             # if not opponents score slot, deposit a seed
             if selectedPos != newState.opponentsScoreSlot():
-                newState.board[newState]+=1
+                newState.board[selectedPos]+=1
                 numOfSeeds-=1
-                
-        # NEED TO IMPLEMENT STEALING OF OPPOSING PLAYERS SEEDS        
+        
+        # check if landed on own hole
+        if (newState.slotIndex(1)<=selectedPos<=newState.slotIndex(newState.holes)):
+            # if so check if it has only 1 seed and the opposite hole is empty
+            oppositePos = 2 * newState.holes - selectedPos
+            seedsInCurrentPos = newState.board[selectedPos]
+            seedsInOppositePos = newState.board[oppositePos]
+            if (seedsInCurrentPos==1 and seedsInOppositePos>0):
+                newState.board[selectedPos] = 0
+                newState.board[oppositePos] = 0
+                newState.board[newState.playersScoreSlot()] += 1 + seedsInOppositePos
                 
         # check for game over (currentPlayers side is now empty)
         if (len(newState.movesAvailable()) == 0):
@@ -99,24 +123,10 @@ class gameState:
             newState.board[newState.playersScoreSlot()] = currentPlayersFinalScore
             
             newState.gameOver = True
-        
+                
         # change current player if not landed on own slot
-        if selectedPos != newState.playersScoreSlot():
-            if self.currentPlayer == "North":
-                newState.currentPlayer = "South"
-            if self.currentPlayer == "South":
-                newState.currentPlayer = "North"
-    
-    # returns the resultant gameState after a swap
-    def swapResult(self):
-        # create a new copy as a deep copy of the current one
-        newState = copy.deepcopy(self)
-        
-        # swap the two halves of the board
-        newState.board = (
-            newState.board[:newState.holes+1] 
-            + newState.board[newState.holes+1:]
-        )
-        
+        if (selectedPos != newState.playersScoreSlot() or self.firstTurn):
+            newState.firstTurn = False
+            newState.currentPlayer = self.otherPlayer()
+                
         return newState
-        
