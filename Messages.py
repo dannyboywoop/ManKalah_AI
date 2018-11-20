@@ -5,13 +5,13 @@ row_template = row_padding + (box_template * 7)
 score_template = box_template + (" " * 28) + box_template
 
 
-def as_row(stones):
-    """Returns stones as pretty row
+def as_row(seeds):
+    """Returns seeds as pretty row
 
     Arguments:
-    stones -- list of 7 integers representing one players stones
+    seeds -- list of 7 integers representing one players seeds
     """
-    return row_template.format(*stones)
+    return row_template.format(*seeds)
 
 
 def csv_as_int_list(csv):
@@ -45,16 +45,16 @@ class ChangeMessage(object):
 
     def pretty_board(self):
         """Returns `state` as a 'pretty' board"""
-        south_score, north_score = self.state[7], self.state[15]
-        south_stones = self.state[0:7]
-        north_stones = self.state[8:15]
+        north_score, south_score = self.state[7], self.state[15]
+        north_seeds = self.state[0:7]
+        south_seeds = self.state[8:15]
 
         # format data into 'pretty' rows
-        north_row = as_row(north_stones)
-        south_row = as_row(south_stones)
-        score_row = score_template.format(south_score, north_score)
+        north_row = as_row(north_seeds)
+        south_row = as_row(south_seeds)
+        score_row = score_template.format(north_score, south_score)
 
-        return "{}\n{}\n{}".format(south_row, score_row, north_row)
+        return "{}\n{}\n{}".format(north_row, score_row, south_row)
 
     def __str__(self):
         return self.pretty_board()
