@@ -1,5 +1,19 @@
 import copy
 
+row_padding = " " * 4
+box_template = "[{:2}]"
+row_template = row_padding + (box_template * 7)
+score_template = box_template + (" " * 28) + box_template
+
+
+def as_row(seeds):
+    """Returns seeds as pretty row
+
+    Arguments:
+    seeds -- list of 7 integers representing one players seeds
+    """
+    return row_template.format(*seeds)
+
 
 # constants for 7,7 Kalah
 HOLES = 7
@@ -173,3 +187,19 @@ class GameState:
 
         # return resultant state
         return new_state
+
+    def pretty_board(self):
+        """Returns `board` array as a 'pretty' string"""
+        north_score, south_score = self.board[7], self.board[15]
+        north_seeds = self.board[0:7]
+        south_seeds = self.board[8:15]
+
+        # format data into 'pretty' rows
+        north_row = as_row(north_seeds)
+        south_row = as_row(south_seeds)
+        score_row = score_template.format(north_score, south_score)
+
+        return "{}\n{}\n{}".format(north_row, score_row, south_row)
+
+    def __str__(self):
+        return self.pretty_board()
