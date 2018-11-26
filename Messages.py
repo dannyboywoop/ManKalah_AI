@@ -24,11 +24,19 @@ def csv_as_int_list(csv):
 
 
 class StartMessage(object):
+    players = {
+        "North": 0,
+        "South": 1
+    }
+
     def __init__(self, *args):
         if len(args) != 1:
             raise MessageParseException(
                 "Unable to parse `Change` message.\n Args: {}".format(args))
         self.position = args[0]
+
+    def update_game_tree(self, game_tree):
+        game_tree.our_player = StartMessage.players[self.position]
 
     def __str__(self):
         return "START(position={})".format(self.position)
@@ -42,6 +50,10 @@ class ChangeMessage(object):
         self.moveswap = args[0]
         self.state = csv_as_int_list(args[1])
         self.turn = args[2]
+
+    def update_game_tree(self, game_tree):
+        move_index = self.moveswap
+        game_tree.make_move(move_index)
 
     def pretty_board(self):
         """Returns `state` as a 'pretty' board"""
@@ -61,6 +73,10 @@ class ChangeMessage(object):
 
 
 class EndMessage(object):
+    def update_game_tree(self, game_tree):
+        # TODO: do we need to do anything here?
+        pass
+
     def __str__(self):
         return "END"
 

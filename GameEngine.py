@@ -2,11 +2,18 @@ import socket
 import sys
 
 from Messages import StartMessage, ChangeMessage, EndMessage
+from GameTree import GameTree, Node
+from gameState import GameState
 
 
 def as_string(data):
     """Converts incoming bytes into string"""
     return data.decode("UTF-8")
+
+
+def as_bytes(string):
+    """Converts incoming string into bytes"""
+    return string.encode("UTF-8")
 
 
 class UnknownMessageException(Exception):
@@ -45,10 +52,11 @@ class InputParser:
         return message(*self.args)
 
 
-class RequestHandler:
-    def __init__(self, host="localhost", port=12346):
+class GameEngine:
+    def __init__(self, game_tree, host="localhost", port=12346):
         self.host = host
         self.port = port
+        self.game_tree = game_tree
 
     def run(self):
         """Setups socket and receives incoming messages until socket
@@ -61,6 +69,13 @@ class RequestHandler:
 
                 message = InputParser(message).get_message()
                 print(message)
+
+                message.update_game_tree(self.game_tree)
+
+                if self.game_tree.is_our_turn:
+                    best_move = self.game_tree.best_move
+                    apples = "MOVE;{}\n".format(best_move)  # TODO: make into own object
+                    self.conn.sendall(as_bytes(apples))
 
     def _setup_socket(self):
         """Setup socket and wait for connection"""
@@ -91,5 +106,9 @@ class RequestHandler:
 
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 12346
-    RequestHandler(HOST, PORT).run()
+    init_state = GameState()
+    root = Node(init_state, True)
+    game_tree = GameTree(root)
+    game_tree.calculate_children(4)
+
+    GameEngine(game_tree).run()
