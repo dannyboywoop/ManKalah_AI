@@ -91,6 +91,10 @@ class GameState:
         """returns a list of available moves"""
         moves = []
 
+        '''adds the option to swap sides (pie rule) if it is the second players first turn'''
+        if (self.first_turn == True and self.current_player == "North"):
+            moves += [-1]
+
         # for each of the current player's holes, check if it contains seeds
         for i in range(1, HOLES + 1):
             if (self.board[self._hole_index(i)] > 0):
@@ -110,6 +114,12 @@ class GameState:
         Arguments:
         pos -- number [1-7] of the hole to select when making a move
         """
+
+        ''' if pos is -1 the move will be the pie rule swap, instead'''
+        if(pos == -1):
+            return swap_result(self)
+
+
         # get board index of selected hole
         selected_pos = self._hole_index(pos)
 
@@ -187,6 +197,15 @@ class GameState:
 
         # return resultant state
         return new_state
+
+    '''function to swap the sides of the board (pie rule)
+       could be called directly or by using move_result(self,-1)
+       both are implemented for now to not break anything'''
+    def swap_result(self):
+
+        new_state = copy.deepcopy(self)
+        return new_state.board[8:] + new_state.board[:8]
+
 
     def pretty_board(self):
         """Returns `board` array as a 'pretty' string"""
