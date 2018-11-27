@@ -81,8 +81,9 @@ class ChangeMessage:
 
 
 class EndMessage:
-    def update_game_tree(self, game_tree):
-        pass
+    def update_game_tree(self, game_tree=None):
+        print("End message recieved. Terminating.")
+        sys.exit(0)
 
     def __str__(self):
         return "END"
