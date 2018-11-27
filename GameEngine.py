@@ -74,7 +74,10 @@ class GameEngine:
         self._send_move(best_move)
 
     def _send_move(self, hole_index):
-        self.conn.sendall(Move(hole_index).message())
+        move = Move(hole_index)
+        if move.is_swap:
+            self.game_tree.make_move(-1)
+        self.conn.sendall(move.message())
 
     def _setup_socket(self):
         """Setup socket and wait for connection"""

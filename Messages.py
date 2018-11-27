@@ -98,8 +98,11 @@ class EndMessage:
 class Move:
     def __init__(self, hole_index):
         self.hole_index = hole_index
+        self.is_swap = hole_index == -1
 
     def message(self):
+        if self.is_swap:
+            return as_bytes("SWAP\n")
         return as_bytes("MOVE;{}\n".format(self.hole_index))
 
 
