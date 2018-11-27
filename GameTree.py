@@ -1,4 +1,4 @@
-from gameState import GameState
+from GameState import GameState
 from PracticeAlphaBeta import AlphaBetaAI
 import copy
 
@@ -17,9 +17,8 @@ class Node:
             output += child.__str__(level+1, str(key)+": ")
         return output
 
-    # TODO: implement and move to `GameState`
-    def getValue(self):
-        return 100
+    def get_value(self):
+        return self.game_state.get_value(self.our_player)
 
     def is_terminal(self):
         return self.game_state.game_over

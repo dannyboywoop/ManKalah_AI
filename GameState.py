@@ -26,14 +26,14 @@ class GameState:
     methods to determine subsequent states
     """
 
-    def __init__(self):
+    def __init__(self, heuristic=None):
         """Sets up game board and selects South as the first player"""
         self.board = [SEEDS] * HOLES + [0] + [SEEDS] * HOLES + [0]
         self.current_player = 1
         self.game_over = False
         self.first_turn = True
         self.score_holes = [HOLES, 2 * HOLES + 1]  # indices of score holes
-        return
+        self.heuristic = heuristic
 
     def _other_player(self, player=None):
         """given the name of one player, returns the name of the other"""
@@ -59,6 +59,12 @@ class GameState:
             raise Exception("Index out of range")
 
         return player * (HOLES + 1) + hole - 1
+
+    def get_value(self, player):
+        if not self.game_over and self.heuristic:
+            return self.heuristic(self, player)
+        opponent_score = self.scores()[self._other_player(player)]
+        return self.scores()[player] - opponent_score
 
     def clone_server_state(self, board, current_player):
         """clones server state

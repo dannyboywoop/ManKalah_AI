@@ -36,3 +36,20 @@ Recv: CHANGE;1;7,7,7,7,7,7,7,0,0,8,8,8,8,8,8,1;YOU
      [ 0][ 8][ 8][ 8][ 8][ 8][ 8]
 
 ```
+
+## Writing heuristic function
+
+The heuristic function must look like this:
+
+```
+def heuristicFunction(game_state, player):
+        """clones server state
+
+        Arguments:
+        game_state -- GameState instance
+        player -- the player index to maximize
+        """
+    pass
+```
+
+Then pass this into the `GameState` constructor to use it.

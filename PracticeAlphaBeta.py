@@ -24,7 +24,7 @@ class AlphaBetaAI:
         bestMove, next_node = None, None
 
         if (depth_to_search == 0 or node.is_terminal()):
-            return bestMove, next_node, node.getValue()
+            return bestMove, next_node, node.get_value()
 
         # get a dictionary of the possible moves and resultant states
         # from the given state
@@ -82,7 +82,7 @@ class AlphaBetaAI:
 if __name__ == '__main__':
 
     from GameTree import GameTree, Node
-    from gameState import GameState
+    from GameState import GameState
 
     init_state = GameState()
     root = Node(init_state, True)
