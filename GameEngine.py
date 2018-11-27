@@ -2,8 +2,7 @@ import socket
 import sys
 
 from Messages import StartMessage, ChangeMessage, EndMessage
-from GameTree import GameTree, Node
-from gameState import GameState
+from GameTree import GameTree
 
 
 def as_string(data):
@@ -53,10 +52,10 @@ class InputParser:
 
 
 class GameEngine:
-    def __init__(self, game_tree, host="localhost", port=12346):
+    def __init__(self, game_tree=None, host="localhost", port=12346):
         self.host = host
         self.port = port
-        self.game_tree = game_tree
+        self.game_tree = GameTree()
 
     def run(self):
         """Setups socket and receives incoming messages until socket
@@ -105,10 +104,5 @@ class GameEngine:
         return as_string(self.data).split("\n")
 
 
-if __name__ == "__main__":
-    init_state = GameState()
-    root = Node(init_state, True)
-    game_tree = GameTree(root)
-    game_tree.calculate_children(4)
-
-    GameEngine(game_tree).run()
+if __name__ == "__main__":    
+    GameEngine().run()

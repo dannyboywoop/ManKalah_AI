@@ -25,28 +25,29 @@ class GameState:
     Stores the state of a kalah game, with
     methods to determine subsequent states
     """
-    players = {
-        "North": 0,
-        "South": 1
-    }
 
     def __init__(self):
         """Sets up game board and selects South as the first player"""
         self.board = [SEEDS] * HOLES + [0] + [SEEDS] * HOLES + [0]
-        self.current_player = "South"
+        self.current_player = 1
         self.game_over = False
         self.first_turn = True
         self.score_holes = [HOLES, 2 * HOLES + 1]  # indices of score holes
         return
 
+    def _other_player(self, player=None):
+        """given the name of one player, returns the name of the other"""
+        if player is None:
+            player = self.current_player
+        return (player + 1) % 2
+
     def _opponents_score_hole(self):
         """return index of opponents score hole"""
-        opponents_player_number = (self.players[self.current_player] + 1) % 2
-        return self.score_holes[opponents_player_number]
+        return self.score_holes[self._other_player()]
 
     def _players_score_hole(self):
         """return index of current players score hole"""
-        return self.score_holes[self.players[self.current_player]]
+        return self.score_holes[self.current_player]
 
     def _hole_index(self, hole, player=None):
         """converts a player's hole number [1-7] into a board index"""
@@ -57,17 +58,9 @@ class GameState:
         if (hole < 1 or hole > HOLES):
             raise Exception("Index out of range")
 
-        return self.players[player] * (HOLES + 1) + hole - 1
+        return player * (HOLES + 1) + hole - 1
 
-    def _other_player(self, player=None):
-        """given the name of one player, returns the name of the other"""
-        if player is None:
-            player = self.current_player
-        if player == "North":
-            return "South"
-        if player == "South":
-            return "North"
-
+    
     def clone_server_state(self, board, current_player):
         """clones server state
 
@@ -91,10 +84,6 @@ class GameState:
         """returns a list of available moves"""
         moves = []
 
-        '''adds the option to swap sides (pie rule) if it is the second players first turn'''
-        if (self.first_turn == True and self.current_player == "North"):
-            moves += [-1]
-
         # for each of the current player's holes, check if it contains seeds
         for i in range(1, HOLES + 1):
             if (self.board[self._hole_index(i)] > 0):
@@ -114,11 +103,6 @@ class GameState:
         Arguments:
         pos -- number [1-7] of the hole to select when making a move
         """
-
-        ''' if pos is -1 the move will be the pie rule swap, instead'''
-        if(pos == -1):
-            return swap_result(self)
-
 
         # get board index of selected hole
         selected_pos = self._hole_index(pos)
@@ -198,19 +182,10 @@ class GameState:
         # return resultant state
         return new_state
 
-    '''function to swap the sides of the board (pie rule)
-       could be called directly or by using move_result(self,-1)
-       both are implemented for now to not break anything'''
-    def swap_result(self):
-
-        new_state = copy.deepcopy(self)
-        return new_state.board[8:] + new_state.board[:8]
-
-
     def pretty_board(self):
         """Returns `board` array as a 'pretty' string"""
         north_score, south_score = self.board[7], self.board[15]
-        north_seeds = self.board[0:7]
+        north_seeds = self.board[6::-1]  # first 7 seeds in reverse order
         south_seeds = self.board[8:15]
 
         # format data into 'pretty' rows

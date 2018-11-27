@@ -36,7 +36,8 @@ class StartMessage(object):
         self.position = args[0]
 
     def update_game_tree(self, game_tree):
-        game_tree.our_player = StartMessage.players[self.position]
+        our_player = StartMessage.players[self.position]
+        game_tree.calculate_initial_tree(our_player)
 
     def __str__(self):
         return "START(position={})".format(self.position)

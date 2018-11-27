@@ -28,11 +28,11 @@ class AlphaBetaAI:
 
         # get a dictionary of the possible moves and resultant states
         # from the given state
-        children = node.children
+        children = node.get_children()
 
         # if the current state is a max node
         if node.is_max_node:
-            value = -float('inf')
+            value = -inf
 
             # for each possible move
             for move, child in children.items():
@@ -55,7 +55,7 @@ class AlphaBetaAI:
 
         # else if the current state is a min node
         else:
-            value = float('inf')
+            value = inf
 
             # for each possible move
             for move, child in children.items():
