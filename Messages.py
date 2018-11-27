@@ -1,3 +1,5 @@
+import sys
+
 # constants for displaying state as 'pretty' board
 row_padding = " " * 4
 box_template = "[{:2}]"
@@ -23,7 +25,12 @@ def csv_as_int_list(csv):
     return [int(i) for i in csv.split(',') if i.isdigit()]
 
 
-class StartMessage(object):
+def as_bytes(string):
+    """Converts incoming string into bytes"""
+    return string.encode("UTF-8")
+
+
+class StartMessage:
     players = {
         "North": 0,
         "South": 1
@@ -43,7 +50,7 @@ class StartMessage(object):
         return "START(position={})".format(self.position)
 
 
-class ChangeMessage(object):
+class ChangeMessage:
     def __init__(self, *args):
         if len(args) != 3:
             raise MessageParseException(
@@ -73,13 +80,20 @@ class ChangeMessage(object):
         return self.pretty_board()
 
 
-class EndMessage(object):
+class EndMessage:
     def update_game_tree(self, game_tree):
-        # TODO: do we need to do anything here?
         pass
 
     def __str__(self):
         return "END"
+
+
+class Move:
+    def __init__(self, hole_index):
+        self.hole_index = hole_index
+
+    def message(self):
+        return as_bytes("MOVE;{}\n".format(self.hole_index))
 
 
 class MessageParseException(Exception):

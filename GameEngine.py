@@ -1,18 +1,13 @@
 import socket
 import sys
 
-from Messages import StartMessage, ChangeMessage, EndMessage
+from Messages import StartMessage, ChangeMessage, EndMessage, Move
 from GameTree import GameTree
 
 
 def as_string(data):
     """Converts incoming bytes into string"""
     return data.decode("UTF-8")
-
-
-def as_bytes(string):
-    """Converts incoming string into bytes"""
-    return string.encode("UTF-8")
 
 
 class UnknownMessageException(Exception):
@@ -72,9 +67,14 @@ class GameEngine:
                 message.update_game_tree(self.game_tree)
 
                 if self.game_tree.is_our_turn:
-                    best_move = self.game_tree.best_move
-                    apples = "MOVE;{}\n".format(best_move)  # TODO: make into own object
-                    self.conn.sendall(as_bytes(apples))
+                    self._send_best_move()
+
+    def _send_best_move(self):
+        best_move = self.game_tree.best_move
+        self._send_move(best_move)
+
+    def _send_move(self, hole_index):
+        self.conn.sendall(Move(hole_index).message())
 
     def _setup_socket(self):
         """Setup socket and wait for connection"""
