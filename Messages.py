@@ -55,9 +55,15 @@ class ChangeMessage:
         if len(args) != 3:
             raise MessageParseException(
                 "Unable to parse `Change` message.\n Args: {}".format(args))
-        self.moveswap = args[0]
+        self.moveswap = self._parse_index_or_swap(args[0])
         self.state = csv_as_int_list(args[1])
         self.turn = args[2]
+
+    def _parse_index_or_swap(self, arg):
+        if arg == "SWAP":
+            return -1
+        else:
+            return int(arg)
 
     def update_game_tree(self, game_tree):
         move_index = self.moveswap
