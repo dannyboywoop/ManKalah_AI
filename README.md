@@ -42,7 +42,7 @@ Recv: CHANGE;1;7,7,7,7,7,7,7,0,0,8,8,8,8,8,8,1;YOU
 The heuristic function must look like this:
 
 ```
-def heuristicFunction(game_state, player):
+def heuristic_function(game_state, player):
         """clones server state
 
         Arguments:
