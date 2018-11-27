@@ -60,7 +60,6 @@ class GameState:
 
         return player * (HOLES + 1) + hole - 1
 
-    
     def clone_server_state(self, board, current_player):
         """clones server state
 
@@ -134,9 +133,8 @@ class GameState:
 
         # check if landed on own hole
         performed_capture = False
-        if (new_state._hole_index(1)
-                <= selected_pos
-                <= new_state._hole_index(HOLES)):
+        if (new_state._hole_index(1) <= selected_pos <=
+                new_state._hole_index(HOLES)):
             # if so check if it has only 1 seed and the opposite hole is empty
             opposite_pos = 2 * HOLES - selected_pos
             seeds_in_current_pos = new_state.board[selected_pos]
@@ -146,19 +144,18 @@ class GameState:
                 new_state.board[selected_pos] = 0
                 new_state.board[opposite_pos] = 0
                 new_state.board[new_state._players_score_hole()] += (
-                        1 + seeds_in_opposite_pos
+                    1 + seeds_in_opposite_pos
                 )
 
         # check for game over (currentPlayers side is now empty)
         if (len(new_state.moves_available()) == 0):
             # read opponents score
             opponents_final_score = new_state.board[
-                    new_state._opponents_score_hole()]
+                new_state._opponents_score_hole()]
 
             # current player gets all remaining seeds
-            current_players_final_score = (SEEDS * HOLES * 2
-                                           - opponents_final_score
-                                           )
+            current_players_final_score = (
+                SEEDS * HOLES * 2 - opponents_final_score)
 
             # set all board values to 0
             new_state.board = [0] * (2 * HOLES + 2)
@@ -173,9 +170,8 @@ class GameState:
             new_state.game_over = True
 
         # change current player if turn is over
-        if (selected_pos != new_state._players_score_hole()
-                or self.first_turn
-                or performed_capture):
+        if (selected_pos != new_state._players_score_hole() or
+                self.first_turn or performed_capture):
             new_state.first_turn = False
             new_state.current_player = self._other_player()
 
