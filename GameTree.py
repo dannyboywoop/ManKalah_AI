@@ -78,7 +78,8 @@ class GameTree:
             child.children[-1] = Node(cloned_state, our_new_player, self)
 
     def make_move(self, index):
-        self.root.children[int(index)].make_root()
+        self.root.get_children()
+        self.root.children[index].make_root()
 
     @property
     def is_our_turn(self):
