@@ -1,5 +1,5 @@
 from GameState import GameState
-from PracticeAlphaBeta import AlphaBetaAI
+from AlphaBetaAI import AlphaBetaAI
 import copy
 
 
