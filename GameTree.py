@@ -9,13 +9,7 @@ class Node:
         self.our_player = our_player
         self.children = {}
         self.tree = tree
-
-    def __str__(self, level=0, move=""):
-        left_padding = " " * 2 * level
-        output = left_padding + move + "\n" + str(self.game_state) + "\n"
-        for key, child in self.children.items():
-            output += child.__str__(level+1, str(key)+": ")
-        return output
+        self.tree.nodes_in_memory += 1
 
     def get_value(self):
         return self.game_state.get_value(self.our_player)
@@ -35,28 +29,19 @@ class Node:
     def make_root(self):
         self.tree.root = self
 
-    @property
-    def payoff(self):
-        if self.is_terminal():
-            return self.game_state.payoff
-        return self.game_state.heuristic_value
+    def __del__(self):
+        self.tree.nodes_in_memory -= 1
 
     @property
     def is_max_node(self):
         return self.game_state.current_player == self.our_player
 
-    @property
-    def node_count(self):
-        self.numberOfNodes = 1
-        for node in self.children.values():
-            self.numberOfNodes += node.node_count
-        return self.numberOfNodes
-
 
 class GameTree:
     def __init__(self):
         self.root = None
-        self.ai = AlphaBetaAI(4)
+        self.nodes_in_memory = 0
+        self.ai = AlphaBetaAI(5)
 
     def calculate_initial_tree(self, our_player):
         if self.root is not None:
@@ -87,15 +72,6 @@ class GameTree:
 
     @property
     def best_move(self):
-        move, next_state, expected_value = self.ai.choose_move(self)
+        move, _, _ = self.ai.choose_move(self)
+        print("{} node(s) in memory".format(self.nodes_in_memory))
         return move
-
-    def __str__(self):
-        return self.root.__str__()
-
-
-if __name__ == "__main__":
-    game_tree = GameTree()
-    game_tree.calculate_initial_tree(0)
-
-    print(game_tree)
