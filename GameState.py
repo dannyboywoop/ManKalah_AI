@@ -1,18 +1,5 @@
+"""Contains the GameState class"""
 import copy
-
-row_padding = " " * 4
-box_template = "[{:2}]"
-row_template = row_padding + (box_template * 7)
-score_template = box_template + (" " * 28) + box_template
-
-
-def as_row(seeds):
-    """Returns seeds as pretty row
-
-    Arguments:
-    seeds -- list of 7 integers representing one players seeds
-    """
-    return row_template.format(*seeds)
 
 
 # constants for 7,7 Kalah
@@ -55,7 +42,7 @@ class GameState:
             player = self.current_player
 
         # check in range
-        if (hole < 1 or hole > HOLES):
+        if hole < 1 or hole > HOLES:
             raise Exception("Index out of range")
 
         return player * (HOLES + 1) + hole - 1
@@ -66,7 +53,7 @@ class GameState:
         Arguments:
         player -- the number of the player that should receive the seeds"""
         if player is None:
-            player = self.currentPlayer
+            player = self.current_player
 
         # get current scores
         final_scores = list(self.scores())
@@ -81,29 +68,12 @@ class GameState:
         self.board = [0] * 7 + [final_scores[0]] + [0] * 7 + [final_scores[1]]
 
     def get_value(self, player):
+        """returns the value (heuristic or absolute) of the state to
+        a given player"""
         if not self.game_over and self.heuristic:
             return self.heuristic(self, player)
         opponent_score = self.scores()[self._other_player(player)]
         return self.scores()[player] - opponent_score
-
-    def clone_server_state(self, board, current_player):
-        """clones server state
-
-        Arguments:
-        board -- list of ints representing the number of seeds in each hole
-        current_player -- the name of the player who's turn it is
-        """
-        # check current_player name is a valid option
-        if current_player not in self.players.keys():
-            raise Exception("Invalid player")
-
-        # check the server state has the corrent number of holes
-        if (len(board) != 2 * (HOLES + 1)):
-            raise Exception("Invalid board size")
-
-        # copy server state
-        self.board = board
-        self.current_player = current_player
 
     def moves_available(self, player=None):
         """returns a list of available moves"""
@@ -114,7 +84,7 @@ class GameState:
 
         # for each of the current player's holes, check if it contains seeds
         for i in range(1, HOLES + 1):
-            if (self.board[self._hole_index(i, player)] > 0):
+            if self.board[self._hole_index(i, player)] > 0:
                 # if so, hole is a valid move
                 moves += [i]
 
@@ -137,7 +107,7 @@ class GameState:
 
         # get number of seeds in selected hole, check there's atleast 1
         num_of_seeds = self.board[selected_pos]
-        if (num_of_seeds < 1):
+        if num_of_seeds < 1:
             raise Exception("Not a legal move!")
 
         # create a new state as a deep copy of the current one
@@ -147,12 +117,12 @@ class GameState:
         new_state.board[selected_pos] = 0
 
         # place seeds in subsequent holes (ignoring opponents score hole)
-        while (num_of_seeds > 0):
+        while num_of_seeds > 0:
             # move around the board
             selected_pos += 1
 
             # if end is reached go back to the start
-            if (selected_pos == len(new_state.board)):
+            if selected_pos == len(new_state.board):
                 selected_pos = 0
 
             # if not opponents score hole, deposit a seed
@@ -168,7 +138,7 @@ class GameState:
             opposite_pos = 2 * HOLES - selected_pos
             seeds_in_current_pos = new_state.board[selected_pos]
             seeds_in_opposite_pos = new_state.board[opposite_pos]
-            if (seeds_in_current_pos == 1 and seeds_in_opposite_pos > 0):
+            if seeds_in_current_pos == 1 and seeds_in_opposite_pos > 0:
                 performed_capture = True
                 new_state.board[selected_pos] = 0
                 new_state.board[opposite_pos] = 0
@@ -179,10 +149,10 @@ class GameState:
         # check for game over
         for player in range(0, 2):
             # if one of the player's sides is empty
-            if (len(new_state.moves_available(player)) == 0):
+            if len(new_state.moves_available(player)) == 0:
                 # give the remaining seeds to the other player
                 new_state._give_remaining_seeds_to_player(
-                        new_state._other_player(player))
+                    new_state._other_player(player))
 
                 # game over
                 new_state.game_over = True
@@ -195,19 +165,3 @@ class GameState:
 
         # return resultant state
         return new_state
-
-    def pretty_board(self):
-        """Returns `board` array as a 'pretty' string"""
-        north_score, south_score = self.board[7], self.board[15]
-        north_seeds = self.board[6::-1]  # first 7 seeds in reverse order
-        south_seeds = self.board[8:15]
-
-        # format data into 'pretty' rows
-        north_row = as_row(north_seeds)
-        south_row = as_row(south_seeds)
-        score_row = score_template.format(north_score, south_score)
-
-        return "{}\n{}\n{}".format(north_row, score_row, south_row)
-
-    def __str__(self):
-        return self.pretty_board()
