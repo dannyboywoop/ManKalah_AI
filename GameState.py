@@ -155,13 +155,13 @@ class GameState:
 
         # check for game over (currentPlayers side is now empty)
         if (len(new_state.moves_available()) == 0):
-            # read opponents score
-            opponents_final_score = new_state.board[
-                new_state._opponents_score_hole()]
+            # read current player's score
+            players_final_score = new_state.board[
+                new_state._players_score_hole()]
 
-            # current player gets all remaining seeds
-            current_players_final_score = (
-                SEEDS * HOLES * 2 - opponents_final_score)
+            # other player gets all remaining seeds
+            opponents_final_score = (
+                SEEDS * HOLES * 2 - players_final_score)
 
             # set all board values to 0
             new_state.board = [0] * (2 * HOLES + 2)
@@ -170,7 +170,7 @@ class GameState:
             new_state.board[new_state._opponents_score_hole()]\
                 = opponents_final_score
             new_state.board[new_state._players_score_hole()]\
-                = current_players_final_score
+                = players_final_score
 
             # game over
             new_state.game_over = True
