@@ -28,7 +28,7 @@ class GameState:
 
     def __init__(self, heuristic=None):
         """Sets up game board and selects South as the first player"""
-        self.board = [SEEDS] * HOLES + [0] + [SEEDS] * HOLES + [0]
+        self.board = ([SEEDS] * HOLES + [0]) * 2
         self.current_player = 1
         self.game_over = False
         self.first_turn = True
@@ -60,6 +60,26 @@ class GameState:
 
         return player * (HOLES + 1) + hole - 1
 
+    def _give_remaining_seeds_to_player(self, player=None):
+        """gives all remaining seeds on the board to one player
+
+        Arguments:
+        player -- the number of the player that should receive the seeds"""
+        if player is None:
+            player = self.currentPlayer
+
+        # get current scores
+        final_scores = list(self.scores())
+
+        # calculate number of remaining seeds
+        seeds_remaining = 2 * SEEDS * HOLES - final_scores[0] - final_scores[1]
+
+        # calculate scores after remaining seeds have been distributed
+        final_scores[player] += seeds_remaining
+
+        # set final board state
+        self.board = [0] * 7 + [final_scores[0]] + [0] * 7 + [final_scores[1]]
+
     def get_value(self, player):
         if not self.game_over and self.heuristic:
             return self.heuristic(self, player)
@@ -85,13 +105,16 @@ class GameState:
         self.board = board
         self.current_player = current_player
 
-    def moves_available(self):
+    def moves_available(self, player=None):
         """returns a list of available moves"""
+        if player is None:
+            player = self.current_player
+
         moves = []
 
         # for each of the current player's holes, check if it contains seeds
         for i in range(1, HOLES + 1):
-            if (self.board[self._hole_index(i)] > 0):
+            if (self.board[self._hole_index(i, player)] > 0):
                 # if so, hole is a valid move
                 moves += [i]
 
@@ -153,27 +176,16 @@ class GameState:
                     1 + seeds_in_opposite_pos
                 )
 
-        # check for game over (currentPlayers side is now empty)
-        if (len(new_state.moves_available()) == 0):
-            # read current player's score
-            players_final_score = new_state.board[
-                new_state._players_score_hole()]
+        # check for game over
+        for player in range(0, 2):
+            # if one of the player's sides is empty
+            if (len(new_state.moves_available(player)) == 0):
+                # give the remaining seeds to the other player
+                new_state._give_remaining_seeds_to_player(
+                        new_state._other_player(player))
 
-            # other player gets all remaining seeds
-            opponents_final_score = (
-                SEEDS * HOLES * 2 - players_final_score)
-
-            # set all board values to 0
-            new_state.board = [0] * (2 * HOLES + 2)
-
-            # set final scores
-            new_state.board[new_state._opponents_score_hole()]\
-                = opponents_final_score
-            new_state.board[new_state._players_score_hole()]\
-                = players_final_score
-
-            # game over
-            new_state.game_over = True
+                # game over
+                new_state.game_over = True
 
         # change current player if turn is over
         if (selected_pos != new_state._players_score_hole() or
