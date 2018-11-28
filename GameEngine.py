@@ -1,8 +1,16 @@
+"""Contains the GameEngine class"""
 import socket
 import sys
 
 from Messages import StartMessage, ChangeMessage, EndMessage, Move
 from GameTree import GameTree
+
+
+MESSAGE_TYPES = {
+    "START": StartMessage,
+    "CHANGE": ChangeMessage,
+    "END": EndMessage
+    }
 
 
 def as_string(data):
@@ -11,45 +19,44 @@ def as_string(data):
 
 
 class UnknownMessageException(Exception):
+    """Exception to throw when unknown message received"""
     pass
 
 
 class MultipleMessageException(Exception):
+    """Exception to throw multiple messages received when
+    only one was expected"""
     pass
 
 
-class InputParser:
-    """Handles parsing message strings into message objects"""
-    message_types = {
-        "START": StartMessage,
-        "CHANGE": ChangeMessage,
-        "END": EndMessage
-    }
+def parse_message(message):
+    """parses message strings into message objects"""
+    # can only handle one message at a time
+    if '\n' in message:
+        raise MultipleMessageException("Trying to parse multiple messages")
+    message = message.split(";")
+    message_type = message[0]
+    args = message[1:]
 
-    def __init__(self, message):
-        # can only handle one message at a time
-        if '\n' in message:
-            raise MultipleMessageException("Trying to parse multiple messages")
-        message = message.split(";")
-        self.message_type = message[0]
-        self.args = message[1:]
+    message = MESSAGE_TYPES[message_type]
 
-    def get_message(self):
-        message = InputParser.message_types[self.message_type]
+    # if message doesn't conform to protocol, throw exception
+    if not message:
+        raise UnknownMessageException(
+            "Unrecognized message {}".format(message_type))
 
-        # if message doesn't conform to protocol, throw exception
-        if not message:
-            raise UnknownMessageException(
-                "Unrecognized message {}".format(self.message_type))
-
-        # return new instance of message with remaining message arguments
-        return message(*self.args)
+    # return new instance of message with remaining message arguments
+    return message(*args)
 
 
 class GameEngine:
-    def __init__(self, game_tree=None, host="localhost", port=12346):
+    """Communicates with the ManKalah server,
+    making moves dictated by our AI"""
+    def __init__(self, host="localhost", port=12346):
         self.host = host
         self.port = port
+        self.conn = None
+        self.data = None
         self.game_tree = GameTree()
 
     def run(self):
@@ -61,7 +68,7 @@ class GameEngine:
             for message in self._data_as_messages():
                 print("Recv: {}".format(message))
 
-                message = InputParser(message).get_message()
+                message = parse_message(message)
                 print(message)
 
                 message.update_game_tree(self.game_tree)
@@ -70,22 +77,25 @@ class GameEngine:
                     self._send_best_move()
 
     def _send_best_move(self):
+        """Finds the current best move to make and sends its to the server"""
+        # get the best move from the GameTree
         best_move = self.game_tree.best_move
-        self._send_move(best_move)
 
-    def _send_move(self, hole_index):
-        move = Move(hole_index)
+        # convert the move index to a move message
+        move = Move(best_move)
         if move.is_swap:
             self.game_tree.make_move(-1)
+
+        # send move message
         self.conn.sendall(move.message())
 
     def _setup_socket(self):
         """Setup socket and wait for connection"""
-        with socket.socket() as s:
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.bind((self.host, self.port))
-            s.listen()
-            self.conn, _ = s.accept()
+        with socket.socket() as soc:
+            soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            soc.bind((self.host, self.port))
+            soc.listen()
+            self.conn, _ = soc.accept()
             print("New connection accepted.")
 
     def _receive_data(self):
