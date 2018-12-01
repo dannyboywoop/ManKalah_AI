@@ -130,6 +130,7 @@ if __name__ == "__main__":
 
     # check for heuristic specified as a command line argument
     if len(sys.argv) == 3:
-        heuristic = vars(TestHeuristics)[sys.argv[2]]
+        functionName = sys.argv[2].split(".")
+        heuristic = vars(locals()[functionName[0]])[functionName[1]]
 
     GameEngine(chosen_port, heuristic).run()
