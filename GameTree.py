@@ -50,10 +50,11 @@ class Node:
 
 class GameTree:
     """class for storing a game tree and making decisions based on the tree"""
-    def __init__(self):
+    def __init__(self, heuristic=None):
         self.root = None
         self.nodes_in_memory = 0
         self.ai = AlphaBetaAI(5)
+        self.heuristic = heuristic
 
     def calculate_initial_tree(self, our_player):
         """calculates the initial root node and descendant nodes of
@@ -63,7 +64,7 @@ class GameTree:
             return
 
         # create root node
-        init_state = GameState()
+        init_state = GameState(self.heuristic)
         root = Node(init_state, our_player, self)
         self.root = root
 
