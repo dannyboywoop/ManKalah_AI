@@ -105,7 +105,7 @@ class HeuristicCompTree:
             swap_state.current_player = (swap_state.current_player + 1) % 2
             child.children[-1] = SharedNode(swap_state, self)
 
-    def runGame(self):
+    def run_game(self):
         """Play through the game with the given heuristics, then print
         and return the results"""
         # play the game until game_over reached

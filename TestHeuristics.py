@@ -15,4 +15,4 @@ def test_heuristic(game_state, player):
     return game_state.scores()[player] - opponent_score
 
 if __name__ == "__main__":
-    HeuristicCompTree(bad_heuristic, test_heuristic).runGame()
+    HeuristicCompTree(bad_heuristic, test_heuristic).run_game()
