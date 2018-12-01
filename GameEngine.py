@@ -53,11 +53,25 @@ def parse_message(message):
 class GameEngine:
     """Communicates with the ManKalah server,
     making moves dictated by our AI"""
-    def __init__(self, port=12346, heuristic=None):
-        self.host = "localhost"
-        self.port = port
+    def __init__(self, host="localhost"):
+        self.host = host
         self.conn = None
         self.data = None
+
+        # defaults
+        self.port = 12346
+        heuristic = None
+
+        # check for port specified as command line argument
+        if len(sys.argv) >= 2:
+            if sys.argv[1].isdigit():
+                self.port = int(sys.argv[1])
+
+        # check for heuristic specified as a command line argument
+        if len(sys.argv) == 3:
+            function_module, function_name = sys.argv[2].split(".")
+            heuristic = vars(globals()[function_module])[function_name]
+
         self.game_tree = GameTree(heuristic)
 
     def run(self):
@@ -119,18 +133,4 @@ class GameEngine:
 
 
 if __name__ == "__main__":
-    # default
-    chosen_port = 12346
-    heuristic = None
-
-    # check for port specified as command line argument
-    if len(sys.argv) >= 2:
-        if sys.argv[1].isdigit():
-            chosen_port = int(sys.argv[1])
-
-    # check for heuristic specified as a command line argument
-    if len(sys.argv) == 3:
-        functionName = sys.argv[2].split(".")
-        heuristic = vars(locals()[functionName[0]])[functionName[1]]
-
-    GameEngine(chosen_port, heuristic).run()
+    GameEngine().run()
