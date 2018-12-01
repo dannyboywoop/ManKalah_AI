@@ -1,4 +1,4 @@
-"""Contains variants on Node and GameTree classes for use in HeuristicComp"""
+"""Contains variants on Node and GameTree classes for heuristic comparisons"""
 import copy
 from GameState import GameState
 from AlphaBetaAI import AlphaBetaAI
@@ -6,7 +6,8 @@ from AlphaBetaAI import AlphaBetaAI
 
 class SharedNode:
     """stores a GameState and a dictionary of possible subsequent states
-    that can be reached"""
+    that can be reached. The value of a shared node and whether it is a max
+    node varies depending on the player who owns the root node of the tree"""
     def __init__(self, game_state, tree=None):
         self.game_state = game_state
         self.children = {}
@@ -16,7 +17,7 @@ class SharedNode:
     def get_value(self):
         """returns the value of the GameState to root node player"""
         if self.is_terminal():
-            return self.game_state.scores()[self.root_current_player]
+            return self.game_state.get_value(self.root_current_player)
         else:
             return self.tree.heuristics[self.root_current_player](
                 self.game_state, self.root_current_player)
@@ -46,13 +47,28 @@ class SharedNode:
 
     @property
     def root_current_player(self):
+        """returns the number of the player who's turn it is at the root
+        of the tree"""
         return self.tree.root.game_state.current_player
 
     @property
     def is_max_node(self):
-        """returns true if the node stores a GameState
-        is the same as the root node"""
-        return (self.game_state.current_player == self.root_current_player)
+        """returns true if the node's GameState has the same current player
+        as the node at the root of the tree, i.e the node belongs to the
+        player whos turn it is"""
+        return self.game_state.current_player == self.root_current_player
+
+    def __str__(self):
+        """Returns `SharedNode` string representation
+        in same format as the server"""
+        north_seeds = self.game_state.board[7::-1]
+        south_seeds = self.game_state.board[8:16]
+
+        # format data into rows
+        north_row = ("{}  --" + "  {}" * 7).format(*north_seeds)
+        south_row = ("{}  " * 7 + "--  {}").format(*south_seeds)
+
+        return "{}\n{}".format(north_row, south_row)
 
 
 class HeuristicCompTree:
@@ -76,6 +92,7 @@ class HeuristicCompTree:
         init_state = GameState()
         root = SharedNode(init_state, self)
         self.root = root
+        print(root)
 
         # for all initial moves
         for child in self.root.get_children().values():
@@ -89,17 +106,33 @@ class HeuristicCompTree:
             child.children[-1] = SharedNode(swap_state, self)
 
     def runGame(self):
+        """Play through the game with the given heuristics, then print
+        and return the results"""
+        # play the game until game_over reached
         while not self.root.is_terminal():
             self.make_move(self.best_move)
+
+        # get results
         result = self.root.game_state.scores()
+
+        # print results
         print("Game Over!")
         print("Results: {} {}".format(result[0], result[1]))
+        return result
 
     def make_move(self, index):
         """moves the root of the tree to the node determined by the move index;
         all nodes no longer in the tree are destroyed."""
+        if index == -1:
+            print("Move: Swap")
+        else:
+            print("Move: Player {} - {}".format(
+                self.root.game_state.current_player, index))
+
         self.root.get_children()
         self.root.children[index].make_root()
+
+        print(self.root)
 
     @property
     def best_move(self):
