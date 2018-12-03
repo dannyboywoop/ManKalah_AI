@@ -7,25 +7,21 @@ Repository for COMP34120:AI and GAMES - Project 1
 
 ## Manual Requests with Request Handler
 
-Run `RequestHandler.py` first:
+Run `GameEngine.py` first:
 
-  ```python RequestHandler.py```
+  ```python GameEngine.py```
 
 Run game engine:
 
 ```java -jar ManKalah.jar "nc localhost 12346" "java -jar MKRefAgent.jar"```
 
-The following message should appear on your `RequestHandler.py` console:
+The following message should appear on your `GameEngine.py` console:
 ```
 New connection accepted.
 Recv: START;South # Raw Message from game engine
 START(position=South) # Parsed object
 ```
-Currently, you cannot respond to this. To view a state, you will need to go second.
-
-```java -jar ManKalah.jar "java -jar MKRefAgent.jar" "nc localhost 12346"```
-
-Which should give you the following output:
+Or if you have if the order of the agents is reversed:
 ```
 New connection accepted.
 Recv: START;North
@@ -37,19 +33,49 @@ Recv: CHANGE;1;7,7,7,7,7,7,7,0,0,8,8,8,8,8,8,1;YOU
 
 ```
 
+The GameEngine will then proceed to send and recieve moves until the game is over.
+
 ## Writing heuristic function
 
 The heuristic function must look like this:
 
 ```
 def heuristic_function(game_state, player):
-        """clones server state
+        """evaluates value of a GameState to a given player
 
         Arguments:
         game_state -- GameState instance
-        player -- the player index to maximize
+        player -- the player index to calculate the value for
         """
     pass
 ```
 
-Then pass this into the `GameState` constructor to use it.
+## Using command line arguments
+
+You can now specify the port number for the GameEngine to run on, as well as the heuristic function via command line arguments.
+
+To specify only the port number, run `GameEngine.py` with a single argument:
+
+  ```python GameEngine.py 12345```
+
+Otherwise to specify the port number and the heuristic to use, run `GameEngine.py` with a two argument:
+
+  ```python GameEngine.py 12345 TestHeuristics.bad_heuristic```
+  
+Notice the form of the heuristic function:
+==ModuleNameContainingFunction==.==FunctionName==
+(It is important to make sure that any modules containing heuristic functions you would like to use are imported by GameEngine).
+
+With the ability to specifiy ports and heuristics through command line arguments, it is now very easy to run two copies of the program against each other with different heuristics (without having to change the source code).
+
+## HeuristicCompTree
+The HeuristicCompTree class has been added (along with SharedNode) to make it easier and faster to play to of our bots against each other, with different heuristic functions, to determine a winner. 
+Instead of having to run two seperate bots each calculating the game tree and communicating with the server, a single game tree is created and it calculates the best moves for each of the players depending on their heuristic functions.
+
+To get the results of a match between two heuristic functions, simply import `HeuristicCompTree`, instantiate an obect and use the `run_game()` method as follows:
+
+```
+HeuristicCompTree(heuristic1, heuristic2).run_game()
+```
+
+The method returns a tuple: (heuristic1's score, heuristic2's score).

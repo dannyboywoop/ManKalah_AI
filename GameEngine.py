@@ -4,6 +4,7 @@ import sys
 
 from Messages import StartMessage, ChangeMessage, EndMessage, Move
 from GameTree import GameTree
+import TestHeuristics
 
 
 MESSAGE_TYPES = {
@@ -52,12 +53,26 @@ def parse_message(message):
 class GameEngine:
     """Communicates with the ManKalah server,
     making moves dictated by our AI"""
-    def __init__(self, host="localhost", port=12346):
+    def __init__(self, host="localhost"):
         self.host = host
-        self.port = port
         self.conn = None
         self.data = None
-        self.game_tree = GameTree()
+
+        # defaults
+        self.port = 12346
+        heuristic = None
+
+        # check for port specified as command line argument
+        if len(sys.argv) >= 2:
+            if sys.argv[1].isdigit():
+                self.port = int(sys.argv[1])
+
+        # check for heuristic specified as a command line argument
+        if len(sys.argv) == 3:
+            function_module, function_name = sys.argv[2].split(".")
+            heuristic = vars(globals()[function_module])[function_name]
+
+        self.game_tree = GameTree(heuristic)
 
     def run(self):
         """Setups socket and receives incoming messages until socket

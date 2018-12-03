@@ -36,7 +36,7 @@ class GameState:
         """return index of current players score hole"""
         return self.score_holes[self.current_player]
 
-    def _hole_index(self, hole, player=None):
+    def hole_index(self, hole, player=None):
         """converts a player's hole number [1-7] into a board index"""
         if player is None:
             player = self.current_player
@@ -84,7 +84,7 @@ class GameState:
 
         # for each of the current player's holes, check if it contains seeds
         for i in range(1, HOLES + 1):
-            if self.board[self._hole_index(i, player)] > 0:
+            if self.board[self.hole_index(i, player)] > 0:
                 # if so, hole is a valid move
                 moves += [i]
 
@@ -103,7 +103,7 @@ class GameState:
         """
 
         # get board index of selected hole
-        selected_pos = self._hole_index(pos)
+        selected_pos = self.hole_index(pos)
 
         # get number of seeds in selected hole, check there's atleast 1
         num_of_seeds = self.board[selected_pos]
@@ -132,8 +132,8 @@ class GameState:
 
         # check if landed on own hole
         performed_capture = False
-        if (new_state._hole_index(1) <= selected_pos <=
-                new_state._hole_index(HOLES)):
+        if (new_state.hole_index(1) <= selected_pos <=
+                new_state.hole_index(HOLES)):
             # if so check if it has only 1 seed and the opposite hole is empty
             opposite_pos = 2 * HOLES - selected_pos
             seeds_in_current_pos = new_state.board[selected_pos]
@@ -149,7 +149,7 @@ class GameState:
         # check for game over
         for player in range(0, 2):
             # if one of the player's sides is empty
-            if len(new_state.moves_available(player)) == 0:
+            if not new_state.moves_available(player):
                 # give the remaining seeds to the other player
                 new_state._give_remaining_seeds_to_player(
                     new_state._other_player(player))
