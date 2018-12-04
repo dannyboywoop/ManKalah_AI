@@ -1,5 +1,33 @@
 #include "gameState.h"
 #include <string>
+#include <iomanip>
+
+// pretty board formatter
+std::ostream& operator<<(std::ostream& os, const gameBoard& board) {
+	// print north row
+	os << "   ";
+	for (int i = holes - 1; i >= 0; i--) {
+		os << std::setw(3) << board[i] << ' ';
+	}
+	os << std::endl;
+
+	// print score row
+	os << std::setw(3) << board[holes] << "                             "
+		<< std::setw(3) << board.back() << std::endl;
+
+	// print south row
+	os << "   ";
+	for (int i = holes + 1; i < boardSize - 1; i++) {
+		os << std::setw(3) << board[i] << " ";
+	}
+
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const gameState& state) {
+	os << state.board;
+	return os;
+}
 
 // default constructor
 gameState::gameState() :board(defaultBoard), currentPlayer(1), 
@@ -27,12 +55,16 @@ int gameState::holeIndex(int hole, int player) const {
 void gameState::giveRemainingSeedsToPlayer(int player) {
 	std::array<int,2> finalScores = scores();
 	
+	// count seeds left on board
 	int seedsRemaining = totalSeeds - finalScores[0] - finalScores[1];
 	
+	// clear the board of all seeds
 	for (int hole : board) {
 		hole = 0;
 	}
 	
+	// set the scores for each player, givin all remaining seeds to the
+	// specified player
 	board[scoreHoles[player]] = finalScores[player] + seedsRemaining;
 	board[scoreHoles[otherPlayer(player)]] = finalScores[otherPlayer(player)];
 }
@@ -124,4 +156,3 @@ gameState gameState::moveResult(int pos) const {
 	// return resultant state
 	return newState;
 }
-

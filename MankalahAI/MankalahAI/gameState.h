@@ -1,6 +1,7 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
+#include<iostream>
 #include<array>
 #include<set>
 
@@ -11,10 +12,14 @@ const int totalSeeds = 2 * holes * seeds;
 const std::array<int, boardSize> defaultBoard =
 	{ 7,7,7,7,7,7,7,0,7,7,7,7,7,7,7,0 };
 
+typedef std::array<int, boardSize> gameBoard;
+std::ostream& operator<<(std::ostream& os, const gameBoard& board);
+
 class gameState {
+friend std::ostream& operator<<(std::ostream& os, const gameState& state);
 private:
 	const int scoreHoles[2] = { holes, boardSize - 1 };
-	std::array<int, boardSize> board;
+	gameBoard board;
 	int currentPlayer;
 	bool gameOver;
 	bool firstTurn;
