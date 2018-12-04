@@ -57,3 +57,34 @@ def our_vulnerable_holes(game_state: GameState, player: int) -> int:
 def their_vulnerable_holes(game_state: GameState, player: int) -> int:
     opponent = game_state._other_player(player)
     return our_vulnerable_holes(game_state, opponent)
+
+
+heuristic_functions = [
+    num_stones_our_side,
+    num_stones_their_side,
+    our_empty_holes,
+    their_empty_holes,
+    our_vulnerable_holes,
+    their_vulnerable_hole
+]
+
+weights = [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+]
+
+
+def heuristic_combinder(functions: list, weights: list):
+    def output_function(game_state: GameState, player: int) -> int:
+        value = 0
+        for index, function in enumerate(functions):
+            weight = weights[index]
+            value += (weight * function(game_state, player))
+        return value
+    return output_function
+
+heuristic_function = heuristic_combinder(heuristic_functions, weights)
