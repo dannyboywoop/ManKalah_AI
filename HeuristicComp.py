@@ -77,7 +77,7 @@ class HeuristicCompTree:
     def __init__(self, north_heuristic, south_heuristic):
         self.root = None
         self.nodes_in_memory = 0
-        self.ai = AlphaBetaAI(5)
+        self.ai = AlphaBetaAI(3)
         self.heuristics = [north_heuristic.heuristic, south_heuristic.heuristic]
         self._calculate_initial_tree()
 
