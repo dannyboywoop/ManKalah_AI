@@ -3,6 +3,9 @@ from HeuristicComp import HeuristicCompTree
 
 
 def num_stones_our_side(game_state: GameState, player: int) -> int:
+    def get_board_index(hole_index):
+        return game_state.hole_index(hole_index, player)
+
     seed_total = 0
     for hole_index in range(1, 8):
         board_index = get_board_index(hole_index)
@@ -65,7 +68,7 @@ heuristic_functions = [
     our_empty_holes,
     their_empty_holes,
     our_vulnerable_holes,
-    their_vulnerable_hole
+    their_vulnerable_holes
 ]
 
 weights = [
@@ -87,4 +90,6 @@ def heuristic_combinder(functions: list, weights: list):
         return value
     return output_function
 
-heuristic_function = heuristic_combinder(heuristic_functions, weights)
+
+def heuristic_function(weights: list):
+    return heuristic_combinder(heuristic_functions, weights)

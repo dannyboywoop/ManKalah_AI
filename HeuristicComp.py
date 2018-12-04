@@ -78,7 +78,7 @@ class HeuristicCompTree:
         self.root = None
         self.nodes_in_memory = 0
         self.ai = AlphaBetaAI(5)
-        self.heuristics = [north_heuristic, south_heuristic]
+        self.heuristics = [north_heuristic.heuristic, south_heuristic.heuristic]
         self._calculate_initial_tree()
 
     def _calculate_initial_tree(self):
@@ -92,7 +92,7 @@ class HeuristicCompTree:
         init_state = GameState()
         root = SharedNode(init_state, self)
         self.root = root
-        print(root)
+        # print(root)
 
         # for all initial moves
         for child in self.root.get_children().values():
@@ -116,28 +116,34 @@ class HeuristicCompTree:
         result = self.root.game_state.scores()
 
         # print results
-        print("Game Over!")
-        print("Results: {} {}".format(result[0], result[1]))
-        return result
+        # print("Game Over!")
+        # print("Results: {} {}".format(result[0], result[1]))
+
+        if result[0] > result[1]:
+            winner = 0
+        else:
+            winner = 1
+
+        return winner
 
     def make_move(self, index):
         """moves the root of the tree to the node determined by the move index;
         all nodes no longer in the tree are destroyed."""
-        if index == -1:
-            print("Move: Swap")
-        else:
-            print("Move: Player {} - {}".format(
-                self.root.game_state.current_player, index))
+        # if index == -1:
+        #     # print("Move: Swap")
+        # else:
+        #     # print("Move: Player {} - {}".format(
+        #         self.root.game_state.current_player, index))
 
         self.root.get_children()
         self.root.children[index].make_root()
 
-        print(self.root)
+        # print(self.root)
 
     @property
     def best_move(self):
         """searches for and returns the best move available from
         the root node of the tree"""
         move, _, _ = self.ai.choose_move(self)
-        print("{} SharedNode(s) in memory".format(self.nodes_in_memory))
+        # print("{} SharedNode(s) in memory".format(self.nodes_in_memory))
         return move

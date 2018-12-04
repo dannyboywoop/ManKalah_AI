@@ -17,8 +17,8 @@ class AlphaBetaAI:
 
         evaluation = self.evaluate(game_tree.root, self.max_depth)
 
-        print("Searching for best move: {} node(s) checked"
-              .format(self.nodes_checked))
+        # print("Searching for best move: {} node(s) checked"
+        #       .format(self.nodes_checked))
 
         return evaluation
 
