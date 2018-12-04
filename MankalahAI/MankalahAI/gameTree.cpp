@@ -23,8 +23,8 @@ const std::map<int, std::unique_ptr<node>>& node::getChildren() {
 	if (!childrenCalculated) {
 		std::set<int> availableMoves = state.movesAvailable();
 		for (int move : availableMoves) {
-			children[move] = std::make_unique<node>(
-				state.moveResult(move), ourPlayer, tree);
+			children[move] = std::unique_ptr<node>(new node(
+				state.moveResult(move), ourPlayer, tree));
 		}
 		childrenCalculated = true;
 	}
@@ -43,7 +43,7 @@ void gameTree::generateInitialTree(int ourPlayer) {
 
 	// create root node
 	gameState initialState;
-	root = std::make_unique<node>(initialState, ourPlayer, *this);
+	root = std::unique_ptr<node>(new node(initialState, ourPlayer, *this));
 
 	// for all initial moves
 	for (const std::pair<const int, std::unique_ptr<node>>& child :
@@ -55,8 +55,8 @@ void gameTree::generateInitialTree(int ourPlayer) {
 		// add swap move
 		gameState clonedState = child.second->state;
 		int ourNewPlayer = (child.second->ourPlayer + 1) % 2;
-		child.second->children[-1] = std::make_unique<node>(
-			clonedState, ourNewPlayer, *this);
+		child.second->children[-1] = std::unique_ptr<node>(new node(
+			clonedState, ourNewPlayer, *this));
 	}
 }
 
