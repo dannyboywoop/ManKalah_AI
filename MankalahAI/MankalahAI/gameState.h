@@ -31,11 +31,13 @@ private:
 	void giveRemainingSeedsToPlayer(int player);
 
 public:
-	int getValue(int player) const;
+	float getValue(int player) const;
 	std::set<int> movesAvailable() const;
 	std::set<int> movesAvailable(int player) const;
 	std::array<int, 2> scores() const;
 	gameState moveResult(int pos) const;
+	bool isGameOver() const;
+	int getCurrentPlayer() const;
 
 	// default constructor
 	gameState();

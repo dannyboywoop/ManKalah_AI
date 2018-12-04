@@ -1,0 +1,76 @@
+#include "gameTree.h"
+#include <iostream>
+#include <utility>
+
+node::node(gameState state, int player, gameTree& tree):
+	state(state), ourPlayer(player), tree(tree), children() {
+	tree.nodesInMemory++;
+}
+
+node::~node() {
+	tree.nodesInMemory--;
+}
+
+float node::getValue() const {
+	return state.getValue(ourPlayer);
+}
+
+bool node::isTerminal() const {
+	return state.isGameOver();
+}
+
+const std::map<int, std::unique_ptr<node>>& node::getChildren() {
+	if (!childrenCalculated) {
+		std::set<int> availableMoves = state.movesAvailable();
+		for (int move : availableMoves) {
+			children[move] = std::make_unique<node>(
+				state.moveResult(move), ourPlayer, tree);
+		}
+		childrenCalculated = true;
+	}
+	return children;
+}
+
+bool node::isMaxNode() const {
+	return state.getCurrentPlayer() == ourPlayer;
+}
+
+gameTree::gameTree(int maxDepth) :nodesInMemory(0), ai(maxDepth) {}
+
+void gameTree::generateInitialTree(int ourPlayer) {
+	// don't generate tree if a root already exists
+	if (root) return;
+
+	// create root node
+	gameState initialState;
+	root = std::make_unique<node>(initialState, ourPlayer, *this);
+
+	// for all initial moves
+	for (const std::pair<const int, std::unique_ptr<node>>& child :
+		root->getChildren()) {
+
+		// calculate subsequent children
+		child.second->getChildren();
+
+		// add swap move
+		gameState clonedState = child.second->state;
+		int ourNewPlayer = (child.second->ourPlayer + 1) % 2;
+		child.second->children[-1] = std::make_unique<node>(
+			clonedState, ourNewPlayer, *this);
+	}
+}
+
+void gameTree::makeMove(int index) {
+	root->getChildren();
+	root = std::move(root->children[index]);
+}
+
+bool gameTree::isOurTurn() const {
+	return root->isMaxNode();
+}
+
+int gameTree::getBestMove() {
+	int bestMove = ai.chooseMove(*this);
+	std::cout << nodesInMemory << " node(s) in memory" << std::endl;
+	return bestMove;
+}

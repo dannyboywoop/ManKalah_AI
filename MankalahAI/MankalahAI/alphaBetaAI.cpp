@@ -1,16 +1,17 @@
 #include "alphaBetaAI.h"
+#include "gameTree.h"
 #include <iostream>
 #include <utility>
 #include <algorithm>
 
 alphaBetaAI::alphaBetaAI(int maxDepth) :maxDepth(maxDepth), nodesChecked(0) {}
 
-int alphaBetaAI::chooseMove(gameTree tree) {
+int alphaBetaAI::chooseMove(gameTree& tree) {
 	// reset nodesChecked counter
 	nodesChecked = 0;
 
 	// find best move
-	move bestMove = evalualate(tree.root, maxDepth, -inf, inf);
+	move bestMove = evalualate(*tree.root, maxDepth, -inf, inf);
 
 	// print nodes checked in process
 	std::cout << "Searching for best move: " << nodesChecked
@@ -21,7 +22,7 @@ int alphaBetaAI::chooseMove(gameTree tree) {
 }
 
 move alphaBetaAI::evalualate(
-	node currentNode, int depthToSearch, float alpha, float beta) {
+	node& currentNode, int depthToSearch, float alpha, float beta) {
 	// increment number of nodes checked
 	nodesChecked++;
 
@@ -34,17 +35,17 @@ move alphaBetaAI::evalualate(
 	}
 
 	// get children of current node
-	std::map<int, node> children = currentNode.getChildren();
+	const std::map<int, std::unique_ptr<node>>& children = currentNode.getChildren();
 
 	// if the current node is a max node
 	if (currentNode.isMaxNode()) {
 		float value = -inf;
 
 		// for each possible move
-		for (std::pair<int, node> child : children) {
+		for (const std::pair<const int, std::unique_ptr<node>>& child : children) {
 			// check the expected value fo the move
 			float checkValue = evalualate(
-				child.second, depthToSearch - 1, alpha, beta).value;
+				*child.second, depthToSearch - 1, alpha, beta).value;
 
 			// if expected value is better than current best
 			// set that move (and value) as new best
@@ -65,10 +66,10 @@ move alphaBetaAI::evalualate(
 		float value = inf;
 
 		// for each possible move
-		for (std::pair<int, node> child : children) {
+		for (const std::pair<const int, std::unique_ptr<node>>& child : children) {
 			// check the expected value fo the move
 			float checkValue = evalualate(
-				child.second, depthToSearch - 1, alpha, beta).value;
+				*child.second, depthToSearch - 1, alpha, beta).value;
 
 			// if expected value is better than current best
 			// set that move (and value) as new best
@@ -78,7 +79,7 @@ move alphaBetaAI::evalualate(
 			}
 
 			// update beta if appropriate
-			beta = std::max(beta, value);
+			beta = std::min(beta, value);
 
 			// prune current node if possible
 			if (alpha >= beta) break;

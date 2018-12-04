@@ -2,29 +2,39 @@
 #define GAME_TREE_H
 
 #include "gameState.h"
+#include "alphaBetaAI.h"
 #include <map>
-
-class node {
-public:
-	node();
-	~node();
-	float getValue();
-	bool isTerminal();
-	std::map<int, node>& getChildren();
-	void makeRoot();
-	bool isMaxNode();
-};
-
+#include <memory>
 
 class gameTree {
+	friend class node;
 public:
-	gameTree();
-	node root;
+	gameTree(int maxDepth);
+	std::unique_ptr<node> root;
 	void generateInitialTree(int ourPlayer);
 	void makeMove(int index);
-	bool isOurTurn();
+	bool isOurTurn() const;
 	int getBestMove();
+private:
+	int nodesInMemory;
+	alphaBetaAI ai;
 };
 
+class node {
+	friend class gameTree;
+public:
+	node(gameState, int, gameTree&);
+	~node();
+	float getValue() const;
+	bool isTerminal() const;
+	const std::map<int, std::unique_ptr<node>>& getChildren();
+	bool isMaxNode() const;
+private:
+	gameState state;
+	int ourPlayer;
+	std::map<int, std::unique_ptr<node>> children;
+	gameTree& tree;
+	bool childrenCalculated;
+};
 
 #endif

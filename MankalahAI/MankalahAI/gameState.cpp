@@ -69,8 +69,8 @@ void gameState::giveRemainingSeedsToPlayer(int player) {
 	board[scoreHoles[otherPlayer(player)]] = finalScores[otherPlayer(player)];
 }
 
-int gameState::getValue(int player) const {
-	return board[scoreHoles[player]] - board[scoreHoles[otherPlayer(player)]];
+float gameState::getValue(int player) const {
+	return float(board[scoreHoles[player]] - board[scoreHoles[otherPlayer(player)]]);
 }
 
 std::set<int> gameState::movesAvailable() const {
@@ -155,4 +155,12 @@ gameState gameState::moveResult(int pos) const {
 
 	// return resultant state
 	return newState;
+}
+
+bool gameState::isGameOver() const {
+	return gameOver;
+}
+
+int gameState::getCurrentPlayer() const {
+	return currentPlayer;
 }
