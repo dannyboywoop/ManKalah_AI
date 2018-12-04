@@ -1,7 +1,8 @@
 from GameState import GameState
+from HeuristicComp import HeuristicCompTree
 
 
-def player_empty_holes(game_state: GameState, player: int) -> int:
+def our_empty_holes(game_state: GameState, player: int) -> int:
     def get_board_index(hole_index):
         return game_state.hole_index(hole_index, player)
 
@@ -15,38 +16,31 @@ def player_empty_holes(game_state: GameState, player: int) -> int:
     return empty_holes_count
 
 
-def opponent_empty_holes(game_state: GameState, player: int) -> int:
+def their_empty_holes(game_state: GameState, player: int) -> int:
     opponent = game_state._other_player(player)
-    return player_empty_holes(game_state, opponent)
+    return our_empty_holes(game_state, opponent)
 
 
-def heuristic_combinder(functions: list, weights: list):
-    if len(functions) != len(weights):
-        raise Exception()
-    
-    def foo(game_state: GameState, player: int) -> int:
-        output = 0
-        for index, function in enumerate(functions):
-            weight = weights[index]
-            output += (weight * function(game_state, player))
-        return output
-    
-    return foo
+def our_vulnerable_holes(game_state: GameState, player: int) -> int:
+    # TODO: rename this variable?
+    non_empty_holes = []
+    for hole_index in range(1, 7):
+        board_index = game_state.hole_index(hole_index, player)
+        seed_count = game_state.board[board_index]
+        if seed_count:
+            non_empty_holes.append(hole_index)
 
-def test_heuristic(game_state, player):
-    """returns the difference in score between the two players"""
-    opponent_score = game_state.scores()[game_state._other_player(player)]
-    return game_state.scores()[player] - opponent_score
+    opponent = game_state._other_player(player)
+    num_vulnerable_holes = 0
+    for hole_index in non_empty_holes:
+        board_index = game_state.hole_index(hole_index, opponent)
+        seed_count = game_state.board[board_index]
+        if seed_count is 0:
+            num_vulnerable_holes += 1
 
-heuristic = heuristic_combinder(
-    [player_empty_holes, opponent_empty_holes, test_heuristic],
-    [1, 1, 1]
-)
-
-from HeuristicComp import HeuristicCompTree
+    return num_vulnerable_holes
 
 
-
-if __name__ == "__main__":
-    HeuristicCompTree(heuristic, test_heuristic).run_game()
-
+def their_vulnerable_holes(game_state: GameState, player: int) -> int:
+    opponent = game_state._other_player(player)
+    return our_vulnerable_holes(game_state, opponent)
