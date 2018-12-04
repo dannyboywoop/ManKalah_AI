@@ -2,6 +2,20 @@ from GameState import GameState
 from HeuristicComp import HeuristicCompTree
 
 
+def num_stones_our_side(game_state: GameState, player: int) -> int:
+    seed_total = 0
+    for hole_index in range(1, 8):
+        board_index = get_board_index(hole_index)
+        seed_count = game_state.board[board_index]
+        seed_total += seed_count
+    return seed_total
+
+
+def num_stones_their_side(game_state: GameState, player: int) -> int:
+    opponent = game_state._other_player(player)
+    return num_stones_our_side(game_state, opponent)
+
+
 def our_empty_holes(game_state: GameState, player: int) -> int:
     def get_board_index(hole_index):
         return game_state.hole_index(hole_index, player)
