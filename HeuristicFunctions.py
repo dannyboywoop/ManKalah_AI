@@ -22,7 +22,6 @@ def their_empty_holes(game_state: GameState, player: int) -> int:
 
 
 def our_vulnerable_holes(game_state: GameState, player: int) -> int:
-    # TODO: rename this variable?
     non_empty_holes = []
     for hole_index in range(1, 7):
         board_index = game_state.hole_index(hole_index, player)
