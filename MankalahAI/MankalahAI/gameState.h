@@ -1,9 +1,9 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
-#include<iostream>
-#include<array>
-#include<set>
+#include <iostream>
+#include <array>
+#include <set>
 
 const int holes = 7;
 const int seeds = 7;
