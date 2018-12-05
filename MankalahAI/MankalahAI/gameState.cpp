@@ -59,7 +59,7 @@ void gameState::giveRemainingSeedsToPlayer(int player) {
 	int seedsRemaining = totalSeeds - finalScores[0] - finalScores[1];
 	
 	// clear the board of all seeds
-	for (int hole : board) {
+	for (int& hole : board) {
 		hole = 0;
 	}
 	

@@ -3,7 +3,7 @@
 #include <utility>
 
 node::node(gameState state, int player, gameTree& tree):
-	state(state), ourPlayer(player), tree(tree), children() {
+	state(state), ourPlayer(player), children(), tree(tree) {
 	tree.nodesInMemory++;
 }
 
