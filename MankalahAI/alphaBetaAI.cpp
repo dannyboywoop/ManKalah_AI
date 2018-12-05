@@ -4,6 +4,9 @@
 #include <utility>
 #include <algorithm>
 
+move::move() :index(0), value(0) {}
+move::move(int index, float value) :index(index), value(value) {}
+
 alphaBetaAI::alphaBetaAI(int maxDepth) :maxDepth(maxDepth), nodesChecked(0) {}
 
 int alphaBetaAI::chooseMove(gameTree& tree) {
@@ -51,7 +54,8 @@ move alphaBetaAI::evalualate(
 			// set that move (and value) as new best
 			if (checkValue > value) {
 				value = checkValue;
-				bestMove = { child.first, value };
+				bestMove.index = child.first;
+				bestMove.value = value;
 			}
 
 			// update alpha if appropriate
@@ -75,7 +79,8 @@ move alphaBetaAI::evalualate(
 			// set that move (and value) as new best
 			if (checkValue < value) {
 				value = checkValue;
-				bestMove = { child.first, value };
+				bestMove.index = child.first;
+				bestMove.value = value;
 			}
 
 			// update beta if appropriate

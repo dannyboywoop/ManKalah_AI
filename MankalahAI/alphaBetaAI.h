@@ -11,6 +11,8 @@ class node;
 struct move {
 	int index;
 	float value;
+	move();
+	move(int,float);
 };
 
 class alphaBetaAI {

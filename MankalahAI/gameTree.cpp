@@ -2,8 +2,8 @@
 #include <iostream>
 #include <utility>
 
-node::node(gameState state, int player, gameTree& tree):
-	state(state), ourPlayer(player), children(), tree(tree) {
+node::node(gameState state, int player, gameTree& tree): state(state), 
+	ourPlayer(player), children(), tree(tree), childrenCalculated(false) {
 	tree.nodesInMemory++;
 }
 
