@@ -6,9 +6,9 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <string.h>
+#include <cstring>
 #include <string>
-#include <vector>
+#include <algorithm>
 
 void gameEngine::createSocket(){
 	listening = socket(AF_INET, SOCK_STREAM, 0);
@@ -17,7 +17,7 @@ void gameEngine::createSocket(){
 	}
 }
 
-void gameEngine::bindSocket(int port /*=12346*/){
+void gameEngine::bindSocket(uint16_t port /*=12346*/){
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(port);
@@ -63,13 +63,51 @@ int gameEngine::receiveData(char (&buff)[1024]){
 	//std::cout << "Received: " << std::string(buff, 0, bytesRecv) << std::endl;
 }
 
-std::vector<message> parseDataToMessages(){
+std::unique_ptr<message> gameEngine::parseMessage(std::string mess){
+	// if message is a start message
+    if (mess[0] == 'S') 
+		return std::unique_ptr<message>(
+			new startMessage(mess));
 
+	// if message is a change message
+    if (mess[0] == 'C') 
+		return std::unique_ptr<message>(
+			new changeMessage(mess));
+
+	// if message is an end message
+    if (mess[0] == 'E') 
+		return std::unique_ptr<message>(
+			new endMessage(mess));
+
+	// else message not recognised
+	throw std::string("Error: message not recognised");
+}
+
+std::vector<std::unique_ptr<message>> gameEngine::parseDataToMessages(
+	const char (&buff)[1024], int size){
+	
+	std::vector<std::unique_ptr<message>> messages;
+
+	int previousEndLine = -1;
+	for(int i=0; i<size; i++){
+		if(buff[i]=='\n') {
+			messages.push_back(
+				parseMessage(
+					std::string(buff,
+					previousEndLine + 1,
+					i - previousEndLine - 1)
+				)
+			);
+			previousEndLine = i;
+		}
+	}
+
+	return std::move(messages);	
 }
 
 void gameEngine::run(){
 	char buf[1024];
-	std::vector<message> messages;
+	std::vector<std::unique_ptr<message>> messages;
 	while (true) {
 		// recieve data
 		int messageLength = receiveData(buf);
@@ -82,22 +120,26 @@ void gameEngine::run(){
 		messages = parseDataToMessages(buf, messageLength);
 
 		// act on all messages recieved
-		for (const message& m: messages){
-			std::cout<<m.rawMessage<<std::endl;
-			m.printFormatted();
-			m.performMessageAction(tree);
+		for (const auto& m: messages){
+			m->printFormatted();
+			m->performMessageAction(tree);
 		}
+		messages.clear();
+
+		//sendBestMove();
 
 		// make move if appropriate
-		if (tree.isOurTurn()){
+		/*if (tree.isOurTurn()){
 			sendBestMove();
-		}
+		}*/
+		
 	}
 }
 
 void gameEngine::sendBestMove(){
-	// resend message
-	//send(clientSocket, buff, bytesRecv + 1, 0);
+	std::string move;
+	std::getline(std::cin, move);
+	//send(clientSocket, move.c_str(), move.size() + 1, 0);
 }
 
 gameEngine::gameEngine(): gameEngine(7){}

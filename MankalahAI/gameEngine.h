@@ -5,6 +5,7 @@
 #include "gameTree.h"
 #include <netdb.h>
 #include <vector>
+#include <memory>
 
 class gameEngine{
 private:
@@ -16,7 +17,7 @@ private:
 
 	void createSocket();
 
-	void bindSocket(int port=12346);
+	void bindSocket(uint16_t port=12346);
 
 	void markSocketForListening(int maxClients = 1);
 
@@ -26,7 +27,10 @@ private:
 	
 	void sendBestMove();
 
-    std::vector<message> parseDataToMessages(const char (&buf)[1024], int size);
+    std::vector<std::unique_ptr<message>> parseDataToMessages(
+		const char (&buff)[1024], int size);
+	
+	std::unique_ptr<message> parseMessage(std::string);
 
 public:
 	gameEngine();

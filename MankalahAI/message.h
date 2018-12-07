@@ -5,12 +5,34 @@
 #include <string>
 
 class message{
-public:
+protected:
     std::string rawMessage;
-    void printFormatted() const;
-    void performMessageAction(gameTree& tree) const;
+public:
+    message(std::string);
+    virtual void printFormatted() const = 0;
+    virtual void performMessageAction(gameTree&) const = 0;
 };
 
+class startMessage: public message{
+public:
+    startMessage(std::string);
+    void printFormatted() const;
+    void performMessageAction(gameTree&) const;
+};
+
+class changeMessage: public message{
+public:
+    changeMessage(std::string);
+    void printFormatted() const;
+    void performMessageAction(gameTree&) const;
+};
+
+class endMessage: public message{
+public:
+    endMessage(std::string);
+    void printFormatted() const;
+    void performMessageAction(gameTree&) const;
+};
 
 
 #endif
