@@ -1,6 +1,34 @@
 from GameState import GameState
 from HeuristicComp import HeuristicCompTree
 
+def our_num_points(game_state: GameState, player: int) -> int:
+    return game_state.hole_index(8, player)
+
+def their_num_points(game_state: GameState, player: int) -> int:
+    opponent = game_state._other_player(player)
+    return game_state.hole_index(8, opponent)
+
+def num_our_go_again_turns(game_state: GameState, player) ->int:
+    def get_board_index(hole_index):
+        return game_state.hole_index(hole_index, player)
+    turns_avalible = 0
+    for hole_index in range(1,7):
+        board_index = get_board_index(hole_index)
+        if( game_state.board[board_index]== (8-hole_index) ):
+            turns_avalible += 1
+    return turns_avalible
+
+def num_their_go_again_turns(game_state: GameState, player) ->int:
+    oppenont = game_state._other_player(player)
+    def get_board_index(hole_index):
+        return game_state.hole_index(hole_index, oppenont)
+
+    turns_avalible = 0
+    for hole_index in range(1,7):
+        board_index = get_board_index(hole_index)
+        if( game_state.board[board_index]== (8-hole_index) ):
+            turns_avalible += 1
+    return turns_avalible
 
 def num_stones_our_side(game_state: GameState, player: int) -> int:
     def get_board_index(hole_index):
