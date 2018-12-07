@@ -1,10 +1,11 @@
 #include "gameTree.h"
+#include "gameEngine.h"
 #include <iostream>
 #include <list>
 #include <chrono>
 
 int main() {
-	// Record start time
+	/*// Record start time
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	// go through the game
@@ -29,6 +30,10 @@ int main() {
 		std::cout << move << ", ";
 	}
 	std::cout << std::endl;
+	*/
+
+	gameEngine engine;
+	engine.run();	
 
 	return 0;
 }
