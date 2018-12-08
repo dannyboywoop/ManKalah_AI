@@ -139,7 +139,7 @@ void gameEngine::sendBestMove(){
 	std::string move;
 	std::getline(std::cin, move);
 	move += '\n';
-	send(clientSocket, move.c_str(), move.size() + 1, 0);
+	send(clientSocket, move.c_str(), move.size(), 0);
 }
 
 gameEngine::gameEngine(): gameEngine(7){}
