@@ -79,3 +79,21 @@ HeuristicCompTree(heuristic1, heuristic2).run_game()
 ```
 
 The method returns a tuple: (heuristic1's score, heuristic2's score).
+
+## C++ Version
+
+You can build the c++ version using the two make files available:
+  ```make -f DEBUG.make```
+or
+  ```make -f release.make```
+  
+You can clean or rebuild by adding the relevant argument:
+  ```make -f DEBUG.make clean```
+  
+  ```make -f release.make rebuild```
+  
+By default it runs on port 12346, but you can choose a different port when you run it by adding a single command line argument:
+
+
+  ```./MankalahAI.out 54123```
+  
