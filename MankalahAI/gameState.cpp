@@ -4,22 +4,30 @@
 
 // pretty board formatter
 std::ostream& operator<<(std::ostream& os, const gameBoard& board) {
+	// print top border
+	os << "--------------------------------------" << std::endl;
+
 	// print north row
-	os << "   ";
+	os << "|   ";
 	for (int i = holes - 1; i >= 0; i--) {
 		os << std::setw(3) << board[i] << ' ';
 	}
-	os << std::endl;
+	os << "     |" << std::endl;
 
 	// print score row
-	os << std::setw(3) << board[holes] << "                             "
-		<< std::setw(3) << board.back() << std::endl;
+	os << '|' << std::setw(3) << board[holes] << "                            "
+		<< std::setw(3) << board.back() << "  |" << std::endl;
 
 	// print south row
-	os << "   ";
+	os << "|   ";
 	for (int i = holes + 1; i < boardSize - 1; i++) {
-		os << std::setw(3) << board[i] << " ";
+		os << std::setw(3) << board[i] << ' ';
 	}
+	os << "     |" << std::endl;
+
+
+	// print bottom border
+	os << "--------------------------------------";	
 
 	return os;
 }

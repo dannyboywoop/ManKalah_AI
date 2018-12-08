@@ -44,6 +44,7 @@ void gameTree::generateInitialTree(int ourPlayer) {
 	// create root node
 	gameState initialState;
 	root = std::unique_ptr<node>(new node(initialState, ourPlayer, *this));
+	std::cout << initialState << std::endl;
 
 	// for all initial moves
 	for (const std::pair<const int, std::unique_ptr<node>>& child :
@@ -63,10 +64,11 @@ void gameTree::generateInitialTree(int ourPlayer) {
 void gameTree::makeMove(int index) {
 	root->getChildren();
 	root = std::move(root->children[index]);
+	std::cout << root->state << std::endl;
 }
 
 bool gameTree::isOurTurn() const {
-	return root->isMaxNode();
+	return (root->isMaxNode() && !root->isTerminal());
 }
 
 int gameTree::getBestMove() {
