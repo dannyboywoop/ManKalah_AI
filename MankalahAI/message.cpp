@@ -1,6 +1,7 @@
 #include "message.h"
 #include <iostream>
-    
+
+// construct a message object from a string    
 message::message(std::string text) : rawMessage(text) {}
 
 // start message methods

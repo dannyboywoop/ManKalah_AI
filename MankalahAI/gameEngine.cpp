@@ -10,6 +10,7 @@
 #include <string>
 #include <algorithm>
 
+// create the listening socket
 void gameEngine::createSocket(){
 	listening = socket(AF_INET, SOCK_STREAM, 0);
 	if (listening == -1) {
@@ -17,6 +18,7 @@ void gameEngine::createSocket(){
 	}
 }
 
+// bind the socket to a port/IP
 void gameEngine::bindSocket(uint16_t port){
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
@@ -28,12 +30,14 @@ void gameEngine::bindSocket(uint16_t port){
 	}
 }
 
+// mark socket for listening (you could have read the method name on this one)
 void gameEngine::markSocketForListening(int maxClients /*= 1*/){
 	if (listen(listening, maxClients) == -1) {
 		throw std::string("Error: Listen failed!");
 	}
 }
 
+// accept connection from client (ManKalah.jar)
 void gameEngine::acceptCall(){
 
 	clientSocket = accept(listening,
@@ -49,6 +53,7 @@ void gameEngine::acceptCall(){
 	close(listening);
 }
 
+// read socket info into buffer
 int gameEngine::receiveData(char (&buff)[1024]){
 	// clear the buffer
 	memset(buff, 0, 1024);
@@ -63,6 +68,7 @@ int gameEngine::receiveData(char (&buff)[1024]){
 	//std::cout << "Received: " << std::string(buff, 0, bytesRecv) << std::endl;
 }
 
+// convert a string into a message object
 std::unique_ptr<message> gameEngine::parseMessage(std::string mess){
 	// if message is a start message
     if (mess[0] == 'S') 
@@ -83,15 +89,20 @@ std::unique_ptr<message> gameEngine::parseMessage(std::string mess){
 	throw std::string("Error: message not recognised");
 }
 
+// get all messages from buffer (parsed into message objects)
 std::vector<std::unique_ptr<message>> gameEngine::parseDataToMessages(
 	const char (&buff)[1024], int size){
 	
+	// stores messages
 	std::vector<std::unique_ptr<message>> messages;
 
 	int previousEndLine = -1;
 	for(int i=0; i<size; i++){
+		// messages devided by new line characters
 		if(buff[i]=='\n') {
+			// add message to messages
 			messages.push_back(
+				// parse the message string to a message object
 				parseMessage(
 					std::string(buff,
 					previousEndLine + 1,
@@ -105,6 +116,7 @@ std::vector<std::unique_ptr<message>> gameEngine::parseDataToMessages(
 	return std::move(messages);	
 }
 
+// play the game
 void gameEngine::run(){
 	char buf[1024];
 	std::vector<std::unique_ptr<message>> messages;
@@ -134,6 +146,7 @@ void gameEngine::run(){
 	}
 }
 
+// calculates and sends the best available move
 void gameEngine::sendBestMove(){
 	
 	// get the best move from gameTree
@@ -153,6 +166,7 @@ void gameEngine::sendBestMove(){
 	send(clientSocket, moveMessage.c_str(), moveMessage.size(), 0);
 }
 
+// gameEngine constructor
 gameEngine::gameEngine(int maxTreeDepth, uint16_t port): tree(maxTreeDepth) {
 	// create a socket
 	createSocket();

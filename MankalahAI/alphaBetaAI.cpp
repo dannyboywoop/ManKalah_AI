@@ -4,11 +4,14 @@
 #include <utility>
 #include <algorithm>
 
+// move constructors
 move::move() :index(0), value(0) {}
 move::move(int index, float value) :index(index), value(value) {}
 
+// alphaBetaAi constructors
 alphaBetaAI::alphaBetaAI(int maxDepth) :maxDepth(maxDepth), nodesChecked(0) {}
 
+// calulates and returns the best available move
 int alphaBetaAI::chooseMove(gameTree& tree) {
 	// reset nodesChecked counter
 	nodesChecked = 0;

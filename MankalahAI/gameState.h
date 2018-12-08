@@ -1,3 +1,4 @@
+// header guard
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
@@ -5,6 +6,7 @@
 #include <array>
 #include <set>
 
+// board constants
 const int holes = 7;
 const int seeds = 7;
 const int boardSize = 2 * holes + 2;

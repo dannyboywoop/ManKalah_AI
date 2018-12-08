@@ -1,3 +1,4 @@
+// header guard
 #ifndef ALPHA_BETA_AI_H
 #define ALPHA_BETA_AI_H
 

@@ -32,6 +32,7 @@ std::ostream& operator<<(std::ostream& os, const gameBoard& board) {
 	return os;
 }
 
+// insertion operator overload for gameState
 std::ostream& operator<<(std::ostream& os, const gameState& state) {
 	os << state.board;
 	return os;
@@ -41,17 +42,22 @@ std::ostream& operator<<(std::ostream& os, const gameState& state) {
 gameState::gameState() :board(defaultBoard), currentPlayer(1), 
 	gameOver(false), firstTurn(true) {}
 
+// returns the player whos turn it isn't
 int gameState::otherPlayer() const {
 	return otherPlayer(currentPlayer);
 }
+
+// returns the number of the player opposite to the player entered
 int gameState::otherPlayer(int player) const {
 	return (player + 1) % 2;
 }
 
-
+// convert a hole number to a board index for the current player
 int gameState::holeIndex(int hole) const {
 	return holeIndex(hole, currentPlayer);
 }
+
+// convert a hole number to a board index for the given player
 int gameState::holeIndex(int hole, int player) const {
 	if (hole < 1 || hole > holes) {
 		throw std::string("Invalid hole number!");
@@ -60,6 +66,7 @@ int gameState::holeIndex(int hole, int player) const {
 }
 
 
+// pass all seeds left on the board to the specified player
 void gameState::giveRemainingSeedsToPlayer(int player) {
 	std::array<int,2> finalScores = scores();
 	
@@ -77,14 +84,18 @@ void gameState::giveRemainingSeedsToPlayer(int player) {
 	board[scoreHoles[otherPlayer(player)]] = finalScores[otherPlayer(player)];
 }
 
+// returns the value of the state
 float gameState::getValue(int player) const {
-	return float(board[scoreHoles[player]] - board[scoreHoles[otherPlayer(player)]]);
+	return float(board[scoreHoles[player]] 
+		- board[scoreHoles[otherPlayer(player)]]);
 }
 
+// returns a set of possible moves for the current player
 std::set<int> gameState::movesAvailable() const {
 	return movesAvailable(currentPlayer);
 }
 
+// returns a set of possible moves for the player specified
 std::set<int> gameState::movesAvailable(int player) const {
 	std::set<int> moves;
 	for (int i = 1; i <= holes; i++) {
@@ -94,10 +105,12 @@ std::set<int> gameState::movesAvailable(int player) const {
 	return moves;
 }
 
+// return an array of scores [north's score, south's score]
 std::array<int, 2> gameState::scores() const {
 	return { board[scoreHoles[0]], board[scoreHoles[1]] };
 }
 
+// returns the state that would result from a given move
 gameState gameState::moveResult(int pos) const {
 	// get board index of selected hole
 	int selectedPos = holeIndex(pos);
@@ -165,10 +178,12 @@ gameState gameState::moveResult(int pos) const {
 	return newState;
 }
 
+// check if the state represents a game over state
 bool gameState::isGameOver() const {
 	return gameOver;
 }
 
+// returns the number of the player who's turn it is
 int gameState::getCurrentPlayer() const {
 	return currentPlayer;
 }

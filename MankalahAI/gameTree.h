@@ -1,3 +1,4 @@
+// header guard
 #ifndef GAME_TREE_H
 #define GAME_TREE_H
 
