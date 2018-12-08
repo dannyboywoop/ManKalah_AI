@@ -1,38 +1,17 @@
-#include "gameTree.h"
 #include "gameEngine.h"
-#include <iostream>
-#include <list>
-#include <chrono>
 
-int main() {
-	/*// Record start time
-	auto start = std::chrono::high_resolution_clock::now();
-	
-	// go through the game
-	gameTree tree(8);
-	std::list<int> bestMoves;
-	tree.generateInitialTree(1);
-	while(!tree.root->isTerminal()) {
-		int bestMove = tree.getBestMove();
-		bestMoves.push_back(bestMove);
-		tree.makeMove(bestMove);
+int main(int argc, char *argv[]) {
+	uint16_t port = 12346;
+	int maxTreeSearchDepth = 7;
+
+	// check if exactly one command line argument was entered;
+	if (argc == 2) {
+		// attempt to parse the command line argument as a port number
+		int portNum = std::stoi(argv[1]);
+		port = static_cast<uint16_t>(portNum);
 	}
 
-	// Record end time
-	auto finish = std::chrono::high_resolution_clock::now();
-
-	// measure time elapsed
-	std::chrono::duration<double> elapsed = (finish - start)/bestMoves.size();
-	std::cout << "Time for execution: " << elapsed.count() << "s" << std::endl;
-
-	// output moves
-	for (int move : bestMoves) {
-		std::cout << move << ", ";
-	}
-	std::cout << std::endl;
-	*/
-
-	gameEngine engine;
+	gameEngine engine(maxTreeSearchDepth, port);
 	engine.run();	
 
 	return 0;

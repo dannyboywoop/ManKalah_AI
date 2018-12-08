@@ -17,7 +17,7 @@ private:
 
 	void createSocket();
 
-	void bindSocket(uint16_t port=12346);
+	void bindSocket(uint16_t);
 
 	void markSocketForListening(int maxClients = 1);
 
@@ -33,8 +33,7 @@ private:
 	std::unique_ptr<message> parseMessage(std::string);
 
 public:
-	gameEngine();
-    gameEngine(int);
+	gameEngine(int maxTreeDepth, uint16_t port);
     ~gameEngine();
     
 	void run();

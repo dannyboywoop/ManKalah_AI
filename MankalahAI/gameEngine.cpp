@@ -17,7 +17,7 @@ void gameEngine::createSocket(){
 	}
 }
 
-void gameEngine::bindSocket(uint16_t port /*=12346*/){
+void gameEngine::bindSocket(uint16_t port){
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(port);
@@ -135,21 +135,30 @@ void gameEngine::run(){
 }
 
 void gameEngine::sendBestMove(){
-	std::cout<<"What's your move bud?: ";
-	std::string move;
-	std::getline(std::cin, move);
-	move += '\n';
-	send(clientSocket, move.c_str(), move.size(), 0);
+	
+	// get the best move from gameTree
+	int bestMove = tree.getBestMove();
+
+	// convert the move index to a move message
+	std::string moveMessage;
+	if (bestMove == -1){
+		moveMessage = "SWAP\n";
+		std::cout << "Performed Swap!" << std::endl;
+	}else{
+		moveMessage = "MOVE;" + std::to_string(bestMove) + '\n';
+		std::cout << "Made move: " << bestMove << std::endl;
+	}
+
+	// send move message 
+	send(clientSocket, moveMessage.c_str(), moveMessage.size(), 0);
 }
 
-gameEngine::gameEngine(): gameEngine(7){}
-
-gameEngine::gameEngine(int maxTreeDepth): tree(maxTreeDepth) {
+gameEngine::gameEngine(int maxTreeDepth, uint16_t port): tree(maxTreeDepth) {
 	// create a socket
 	createSocket();
 
 	// bind the socket to an IP / port
-	bindSocket();
+	bindSocket(port);
 
 	// Mark the socket for listening in
 	markSocketForListening();
