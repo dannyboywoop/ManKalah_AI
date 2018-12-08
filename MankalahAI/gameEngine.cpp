@@ -126,20 +126,20 @@ void gameEngine::run(){
 		}
 		messages.clear();
 
-		//sendBestMove();
-
 		// make move if appropriate
-		/*if (tree.isOurTurn()){
+		if (tree.isOurTurn()){
 			sendBestMove();
-		}*/
+		}
 		
 	}
 }
 
 void gameEngine::sendBestMove(){
+	std::cout<<"What's your move bud?: ";
 	std::string move;
 	std::getline(std::cin, move);
-	//send(clientSocket, move.c_str(), move.size() + 1, 0);
+	move += '\n';
+	send(clientSocket, move.c_str(), move.size() + 1, 0);
 }
 
 gameEngine::gameEngine(): gameEngine(7){}
