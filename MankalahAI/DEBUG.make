@@ -6,6 +6,7 @@ ODIR=obj/DEBUG
 BDIR=bin/DEBUG
 _OBJ = main.o alphaBetaAI.o gameState.o gameTree.o gameEngine.o message.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+.PHONY: clean rebuild
 
 $(ODIR)/%.o: %.cpp $(DEPS)
 	$(CC) -c -x c++ $< -g2 -gdwarf-2 -o $@ $(CPPFLAGS)
@@ -16,3 +17,6 @@ $(BDIR)/MankalahAIDEBUG.out: $(OBJ)
 clean:
 	rm -f $(ODIR)/*.o
 	rm -f $(BDIR)/*.out
+
+rebuild: clean $(BDIR)/MankalahAIDEBUG.out
+	# clean then build
