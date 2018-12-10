@@ -144,7 +144,6 @@ def evolve(pop, games_factor=2, retain=0.2, random_select=0.05, mutate=0.01):
     # Randomly mutate some of the new population
     for agent in new_pop:
         if mutate > random.uniform(0, 1):
-            print('Mutate')
             mutated_agent = mutate_agent(agent)
             mutated_pop.append(mutated_agent)
         else:
