@@ -1,4 +1,5 @@
 from numpy import random
+import numpy as np
 from collections import defaultdict
 import heapq
 
@@ -6,7 +7,7 @@ from HeuristicFunctions import heuristic_function
 from HeuristicComp import HeuristicCompTree as Game
 
 
-WEIGHT_COUNT = 7
+WEIGHT_COUNT = 9
 
 
 class Individual:
@@ -20,57 +21,68 @@ def individual(weights):
 
 
 def random_weights():
-    return [random.uniform(0, 1) for _ in range(WEIGHT_COUNT)]
+    return [random.uniform(-1, 1) for _ in range(WEIGHT_COUNT)]
 
 
 def population(count):
     return [individual(random_weights()) for _ in range(count)]
 
 
+def breed_children(parents, num_children):
+    children = []
+    for _ in range(num_children):
+        while True:
+            mother, father = random.choice(parents, 2, replace=False)
+            child = breed(mother, father)
+            if child:
+                break
+        children.append(child)
+    return children
+
+
 def breed(mother, father):
     if mother == father:
-        print('Cannot breed with itself: Error: Mother == Father')
         return
 
     father_weights = father.weights
     mother_weights = mother.weights
+    num_weights = len(father_weights)
 
-    child_weights = []
-    for index in range(len(father_weights)):
-        father_weight = father_weights[index]
-        mother_weight = mother_weights[index]
-        new_child_weight = breed_specific_weight(father_weight, mother_weight)
-        child_weights.append(new_child_weight)
+    child_weights = [breed_weights(
+        mother_weights[i], father_weights[i]) for i in range(num_weights)]
 
     return individual(child_weights)
 
 
-def breed_specific_weight(mother, father):
-    if father > mother:
-        child_weight = random.uniform(mother * .95, father * 1.05)
-    else:
-        child_weight = random.uniform(father * .95, mother * 1.05)
+def breed_weights(mother_weight, father_weight):
+    max_weight = max(mother_weight, father_weight)
+    min_weight = min(mother_weight, father_weight)
 
-    if child_weight < 0:
-        child_weight = 0
-    elif child_weight > 1:
-        child_weight = 1
+    new_weight = random.uniform(min_weight * .95, max_weight * 1.05)
 
-    return child_weight
+    return new_weight
+
+
+def mutate_population(population):
+    mutated_population = []
+    for agent in population:
+        if mutate > random.uniform(0, 1):
+            mutated_agent = mutate_agent(agent)
+            mutated_population.append(mutated_agent)
+        else:
+            mutated_population.append(agent)
+    return mutated_population
 
 
 def mutate_agent(agent):
     weights = agent.weights
 
-    new_weights = []
-    for weight in weights:
-        mutated_weight = mutate_specific_weight(weight)
-        new_weights.append(mutated_weight)
+    mutated_weights = [mutate_weight(weight) for weight in weights]
 
-    return individual(new_weights)
+    return individual(mutated_weights)
 
 
-def mutate_specific_weight(weight):
+def mutate_weight(weight):
     if weight < 0.5:
         new_weight = (1-weight) + random.uniform(-0.5, 0.1)
     else:
@@ -102,58 +114,42 @@ def play_games(population, num_games):
         loser = competitors[loser_index]
 
         scores[winner] += 1
-        scores[loser] -= -1
+        scores[loser] -= 1
 
     return scores
 
 
-def evolve(pop, games_factor=2, retain=0.2, random_select=0.05, mutate=0.01):
-    num_games = len(pop) * games_factor
-    scores = play_games(pop, num_games)
+def evolve(population, games_factor=2, retain=.2, random_select=.1, mutate=.1):
+    population_size = len(population)
+    num_games = population_size * games_factor
 
-    top_performers_size = int(retain * len(pop))
-    bottom_performers_size = len(pop) - top_performers_size
-    rand_select_size = int(len(pop) * random_select)
+    scores = play_games(population, num_games)
 
-    key = scores.get
-    best_perfomers = heapq.nlargest(top_performers_size, scores, key=key)
-    worst_performers = heapq.nsmallest(bottom_performers_size, scores, key=key)
+    top_scorers_size = int(retain * population_size)
+    bottom_scorers_size = population_size - top_scorers_size
+    random_select_size = int(population_size * random_select)
 
-    random_from_worst = random.choice(worst_performers, rand_select_size)
+    score = scores.get
+    best_perfomers = heapq.nlargest(top_scorers_size, scores, key=score)
+    worst_performers = heapq.nsmallest(bottom_scorers_size, scores, key=score)
 
-    parents = best_perfomers + random_from_worst.tolist()
+    random_from_bottom = random.choice(worst_performers, random_select_size)
+
+    parents = best_perfomers + random_from_bottom.tolist()
     random.shuffle(parents)
 
-    # Create children
-    num_children = len(pop) - len(parents)
+    num_children = population_size - len(parents)
+    children = breed_children(parents, num_children)
 
-    children = []
-    for i in range(num_children):
-        while True:
-            current_parents = random.choice(parents, 2, replace=False)
-            father = current_parents[0]
-            mother = current_parents[1]
-            child = breed(mother, father)
-            if child:
-                break
-        children.append(child)
+    new_population = parents + children
+    mutated_population = mutate_population(new_population)
 
-    new_pop = parents + children
-
-    mutated_pop = []
-    # Randomly mutate some of the new population
-    for agent in new_pop:
-        if mutate > random.uniform(0, 1):
-            mutated_agent = mutate_agent(agent)
-            mutated_pop.append(mutated_agent)
-        else:
-            mutated_pop.append(agent)
-    return mutated_pop
+    return mutate_population
 
 
 if __name__ == "__main__":
-    pop_count = 5
-    evolution_cyles = 2
+    pop_count = 1000
+    evolution_cyles = 100
     pop = population(pop_count)
     history = []
     for i in range(evolution_cyles):
@@ -163,6 +159,3 @@ if __name__ == "__main__":
         best_weights = [i.weights for i in pop if i]
         print(best_weights)
         history.append(best_weights)
-
-    print('Evolution Results:')
-    [x for x in history]

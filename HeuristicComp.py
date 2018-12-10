@@ -74,10 +74,10 @@ class SharedNode:
 class HeuristicCompTree:
     """class for storing a game tree shared by both players
     with methods making decisions for both players based on the tree"""
-    def __init__(self, north_heuristic, south_heuristic):
+    def __init__(self, north_heuristic, south_heuristic, depth=4):
         self.root = None
         self.nodes_in_memory = 0
-        self.ai = AlphaBetaAI(3)
+        self.ai = AlphaBetaAI(depth)
         self.heuristics = [north_heuristic.heuristic, south_heuristic.heuristic]
         self._calculate_initial_tree()
 
