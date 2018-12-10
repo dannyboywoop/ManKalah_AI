@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from numpy import random
 import numpy as np
 from collections import defaultdict
@@ -63,10 +65,10 @@ def breed_weights(mother_weight, father_weight):
     return new_weight
 
 
-def mutate_population(population):
+def mutate_population(population, mutation_rate):
     mutated_population = []
     for agent in population:
-        if mutate > random.uniform(0, 1):
+        if mutation_rate > random.uniform(0, 1):
             mutated_agent = mutate_agent(agent)
             mutated_population.append(mutated_agent)
         else:
@@ -142,20 +144,21 @@ def evolve(population, games_factor=2, retain=.2, random_select=.1, mutate=.1):
     children = breed_children(parents, num_children)
 
     new_population = parents + children
-    mutated_population = mutate_population(new_population)
+    mutated_population = mutate_population(new_population, mutate)
 
-    return mutate_population
+    return mutated_population
 
 
 if __name__ == "__main__":
-    pop_count = 1000
-    evolution_cyles = 100
+    pop_count = 500
+    evolution_cyles = 2000
     pop = population(pop_count)
-    history = []
     for i in range(evolution_cyles):
         print("Evolution round #{} of {}".format(i+1, evolution_cyles))
-        pop = evolve(pop, games_factor=1, retain=0.4,
+        pop = evolve(pop, games_factor=5, retain=0.4,
                      random_select=0.2, mutate=0.01)
         best_weights = [i.weights for i in pop if i]
-        print(best_weights)
-        history.append(best_weights)
+
+        with open("output.txt", "a+") as f:
+            f.write(str(best_weights))
+            f.write("\n\n")
