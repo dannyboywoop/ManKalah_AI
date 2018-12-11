@@ -4,6 +4,8 @@
 #include "gameState.h"
 #include <array>
 
+typedef std::array<float,10> weightList;
+
 class heuristic{
 private:
     float numPoints(const gameState&, int);
@@ -12,9 +14,10 @@ private:
     float emptyHoles(const std::array<int, holes>&);
     float vulnerableHoles(const std::array<int, holes>&, const std::array<int, holes>&);
 
-    std::array<int,10> weights;
+    weightList weights;
 public:
     float operator()(const gameState&, int);
+    heuristic(weightList);
 };
 
 #endif

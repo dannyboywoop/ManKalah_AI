@@ -34,7 +34,7 @@ private:
 	std::unique_ptr<message> parseMessage(std::string);
 
 public:
-	gameEngine(int maxTreeDepth, uint16_t port);
+	gameEngine(int maxTreeDepth, uint16_t port, weightList weights);
     ~gameEngine();
     
 	void run();
