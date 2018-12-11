@@ -25,11 +25,6 @@ private:
 	int currentPlayer;
 	bool gameOver;
 	bool firstTurn;
-
-	int otherPlayer() const;
-	int otherPlayer(int player) const;
-	int holeIndex(int hole) const;
-	int holeIndex(int hole, int player) const;
 	void giveRemainingSeedsToPlayer(int player);
 
 public:
@@ -40,6 +35,12 @@ public:
 	gameState moveResult(int pos) const;
 	bool isGameOver() const;
 	int getCurrentPlayer() const;
+	int otherPlayer() const;
+	int otherPlayer(int player) const;
+	int holeIndex(int hole) const;
+	int holeIndex(int hole, int player) const;
+	
+	const gameBoard& getGameBoard() const;
 
 	// default constructor
 	gameState();
