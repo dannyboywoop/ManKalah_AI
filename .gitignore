@@ -5,6 +5,9 @@ __pycache__/
 
 # C extensions
 *.so
+*.o
+*.out
+MankalahAI/.vs
 
 # Distribution / packaging
 .Python
