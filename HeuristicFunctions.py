@@ -99,6 +99,7 @@ heuristic_functions = [
     our_num_points,
     their_num_points,
     num_our_go_again_turns,
+    num_their_go_again_turns,
     num_stones_our_side,
     num_stones_their_side,
     our_empty_holes,
