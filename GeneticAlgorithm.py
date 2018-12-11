@@ -1,59 +1,44 @@
-#!/usr/bin/python3
-
-from numpy import random
 import numpy as np
-from collections import defaultdict
 import heapq
+from progressbar import progressbar
+from numpy import random
+from collections import defaultdict
 
 from HeuristicFunctions import heuristic_function
 from HeuristicComp import HeuristicCompTree as Game
 
 
-WEIGHT_COUNT = 9
-
-
-class Individual:
-    def __init__(self, weights):
-        self.weights = weights
-        self.heuristic = heuristic_function(weights)
-
-
-def individual(weights):
-    return Individual(weights)
+WEIGHT_COUNT = 10
 
 
 def random_weights():
-    return [random.uniform(-1, 1) for _ in range(WEIGHT_COUNT)]
+    return np.array([random.uniform(0, 1) for _ in range(WEIGHT_COUNT)])
 
 
-def population(count):
-    return [individual(random_weights()) for _ in range(count)]
+def population(population_size):
+    return np.array([random_weights() for _ in range(population_size)])
 
 
 def breed_children(parents, num_children):
     children = []
     for _ in range(num_children):
         while True:
-            mother, father = random.choice(parents, 2, replace=False)
-            child = breed(mother, father)
-            if child:
+            choices = np.random.choice(len(parents), 2)
+            mother, father = parents[choices]
+            child = breed_individuals(mother, father)
+            if child is not None:
                 break
         children.append(child)
-    return children
+    return np.array(children)
 
 
-def breed(mother, father):
-    if mother == father:
+def breed_individuals(mother, father):
+    if np.array_equal(mother, father):
         return
 
-    father_weights = father.weights
-    mother_weights = mother.weights
-    num_weights = len(father_weights)
-
-    child_weights = [breed_weights(
-        mother_weights[i], father_weights[i]) for i in range(num_weights)]
-
-    return individual(child_weights)
+    return np.array(
+        [breed_weights(mother[i], father[i]) for i in range(WEIGHT_COUNT)]
+    )
 
 
 def breed_weights(mother_weight, father_weight):
@@ -67,21 +52,19 @@ def breed_weights(mother_weight, father_weight):
 
 def mutate_population(population, mutation_rate):
     mutated_population = []
-    for agent in population:
+    for individual in population:
         if mutation_rate > random.uniform(0, 1):
-            mutated_agent = mutate_agent(agent)
-            mutated_population.append(mutated_agent)
+            mutated_individual = mutate_individual(individual)
+            mutated_population.append(mutated_individual)
         else:
-            mutated_population.append(agent)
-    return mutated_population
+            mutated_population.append(individual)
+    return np.array(mutated_population)
 
 
-def mutate_agent(agent):
-    weights = agent.weights
-
-    mutated_weights = [mutate_weight(weight) for weight in weights]
-
-    return individual(mutated_weights)
+def mutate_individual(individual):
+    return np.array(
+        [mutate_weight(weight) for weight in individual]
+    )
 
 
 def mutate_weight(weight):
@@ -98,25 +81,24 @@ def mutate_weight(weight):
     return new_weight
 
 
+def array_to_key(array):
+    return ','.join(str(x) for x in array)
+
+
 def play_games(population, num_games):
     scores = defaultdict(int)
-    for game in range(num_games):
-        print("Playing game #{} out of {}".format(game+1, num_games))
+    for game in progressbar(range(num_games)):
+        choices = np.random.choice(len(population), 2)
+        competitors = population[choices]
 
-        competitors = random.choice(population, 2)
-        north_competitor = competitors[0]
-        south_competitor = competitors[1]
-
-        game = Game(north_competitor, south_competitor)
-
-        winner_index = game.run_game()
-        loser_index = abs(winner_index - 1)
+        winner_index = Game(competitors[0], competitors[1]).run_game()
+        loser_index = (winner_index + 1) % 2
 
         winner = competitors[winner_index]
         loser = competitors[loser_index]
 
-        scores[winner] += 1
-        scores[loser] -= 1
+        scores[winner.tostring()] += 1
+        scores[loser.tostring()] -= 1
 
     return scores
 
@@ -133,32 +115,44 @@ def evolve(population, games_factor=2, retain=.2, random_select=.1, mutate=.1):
 
     score = scores.get
     best_perfomers = heapq.nlargest(top_scorers_size, scores, key=score)
+    best_perfomers = np.array([np.fromstring(x) for x in best_perfomers])
+
+    record_best_performers(best_perfomers)
+
     worst_performers = heapq.nsmallest(bottom_scorers_size, scores, key=score)
+    worst_performers = np.array([np.fromstring(x) for x in worst_performers])
 
-    random_from_bottom = random.choice(worst_performers, random_select_size)
+    random_choices_from_bottom = np.random.choice(
+        bottom_scorers_size, random_select_size)
+    random_from_bottom = worst_performers[random_choices_from_bottom]
 
-    parents = best_perfomers + random_from_bottom.tolist()
+    parents = np.concatenate((best_perfomers, random_from_bottom), axis=0)
     random.shuffle(parents)
 
     num_children = population_size - len(parents)
     children = breed_children(parents, num_children)
 
-    new_population = parents + children
+    new_population = np.concatenate((parents, children), axis=0)
     mutated_population = mutate_population(new_population, mutate)
 
     return mutated_population
 
 
-if __name__ == "__main__":
-    pop_count = 500
-    evolution_cyles = 2000
-    pop = population(pop_count)
-    for i in range(evolution_cyles):
-        print("Evolution round #{} of {}".format(i+1, evolution_cyles))
-        pop = evolve(pop, games_factor=5, retain=0.4,
-                     random_select=0.2, mutate=0.01)
-        best_weights = [i.weights for i in pop if i]
+def record_best_performers(best_perfomers):
+    with open("best-performers.txt", "a+") as f:
+        f.write(str(best_perfomers) + "\n\n")
 
-        with open("output.txt", "a+") as f:
-            f.write(str(best_weights))
-            f.write("\n\n")
+
+if __name__ == "__main__":
+    pop_count = 5
+    evolution_cyles = 2000
+    population = population(pop_count)
+    for i in range(evolution_cyles):
+        print("Evolution number {}".format(i+1))
+        population = evolve(
+            population,
+            games_factor=1,
+            retain=0.4,
+            random_select=0.2,
+            mutate=0.01
+        )
