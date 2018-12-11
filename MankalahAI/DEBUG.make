@@ -1,10 +1,10 @@
 CC=g++
 CPPFLAGS= -Wall -Wswitch -W"no-deprecated-declarations" -W"empty-body" -Wconversion -W"return-type" -Wparentheses -W"no-format" -Wuninitialized -W"unreachable-code" -W"unused-function" -W"unused-value" -W"unused-variable" -O0 -fno-strict-aliasing -fno-omit-frame-pointer -fthreadsafe-statics -fexceptions -frtti -std=c++11
 LDFLAGS= -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack
-DEPS = alphaBetaAI.h gameState.h gameTree.h gameEngine.h message.h
+DEPS = alphaBetaAI.h gameState.h gameTree.h gameEngine.h message.h heuristicFunctions.h
 ODIR=obj/DEBUG
 BDIR=bin/DEBUG
-_OBJ = main.o alphaBetaAI.o gameState.o gameTree.o gameEngine.o message.o
+_OBJ = main.o alphaBetaAI.o gameState.o gameTree.o gameEngine.o message.o heuristicFunctions.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 .PHONY: clean rebuild
 
