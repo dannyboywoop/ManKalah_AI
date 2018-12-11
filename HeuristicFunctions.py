@@ -1,5 +1,4 @@
 from GameState import GameState
-from HeuristicComp import HeuristicCompTree
 
 
 def our_num_points(game_state: GameState, player: int) -> int:
