@@ -167,7 +167,7 @@ void gameEngine::sendBestMove(){
 }
 
 // gameEngine constructor
-gameEngine::gameEngine(int maxTreeDepth, uint16_t port): tree(maxTreeDepth) {
+gameEngine::gameEngine(int maxTreeDepth, uint16_t port, weightList weights): tree(maxTreeDepth, weights) {
 	// create a socket
 	createSocket();
 

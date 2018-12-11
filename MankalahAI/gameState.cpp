@@ -187,3 +187,8 @@ bool gameState::isGameOver() const {
 int gameState::getCurrentPlayer() const {
 	return currentPlayer;
 }
+
+// returns a copy of the gameBoard
+const gameBoard& gameState::getGameBoard() const {
+	return board;
+}

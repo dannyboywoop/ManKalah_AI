@@ -1,9 +1,11 @@
 #include "gameEngine.h"
+#include "heuristic.h"
 
 // entrance point to the program
 int main(int argc, char *argv[]) {
 	uint16_t port = 12346; // default port
-	int maxTreeSearchDepth = 7;
+	int maxTreeSearchDepth = 5;
+	weightList weights = {1,1,0,0,0,0,0,0,0,0};
 
 	// check if exactly one command line argument was entered;
 	if (argc == 2) {
@@ -14,7 +16,7 @@ int main(int argc, char *argv[]) {
 
 	// create a game engine that searches to the maximum depth specified
 	// listening to the port number specified
-	gameEngine engine(maxTreeSearchDepth, port);
+	gameEngine engine(maxTreeSearchDepth, port, weights);
 	engine.run();	
 
 	return 0;

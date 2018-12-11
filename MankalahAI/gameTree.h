@@ -4,13 +4,14 @@
 
 #include "gameState.h"
 #include "alphaBetaAI.h"
+#include "heuristic.h"
 #include <map>
 #include <memory>
 
 class gameTree {
 	friend class node;
 public:
-	gameTree(int maxDepth);
+	gameTree(int maxDepth, weightList weights);
 	std::unique_ptr<node> root;
 	void generateInitialTree(int ourPlayer);
 	void makeMove(int index);
@@ -19,6 +20,7 @@ public:
 private:
 	int nodesInMemory;
 	alphaBetaAI ai;
+	heuristic heuristicFunction;
 };
 
 class node {

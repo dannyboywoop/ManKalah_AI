@@ -15,7 +15,8 @@ node::~node() {
 
 // returns the value of the node (heuristic or true value)
 float node::getValue() const {
-	return state.getValue(ourPlayer);
+	if (isTerminal()) return state.getValue(ourPlayer);
+	else return tree.heuristicFunction(state, ourPlayer);
 }
 
 // returns whether or not the node should have any children
@@ -46,7 +47,8 @@ bool node::isMaxNode() const {
 }
 
 // gameTree constructor
-gameTree::gameTree(int maxDepth) :nodesInMemory(0), ai(maxDepth) {}
+gameTree::gameTree(int maxDepth, weightList weights) 
+	:nodesInMemory(0), ai(maxDepth), heuristicFunction(weights) {}
 
 // generates the first two levels of the game tree, accounting for extra
 // "SWAP" options on second level
