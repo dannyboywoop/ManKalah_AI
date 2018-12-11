@@ -30,6 +30,9 @@ class AlphaBetaAI:
         best_move, next_node = None, None
 
         if depth_to_search == 0 or node.is_terminal():
+            # TODO: Remove later
+            # if node.is_terminal():
+            #     print("Terminal node: move({}) value({})".format(best_move, node.get_value()))
             return best_move, next_node, node.get_value()
 
         # get a dictionary of the possible moves and resultant states
@@ -81,4 +84,6 @@ class AlphaBetaAI:
                 # prune current node if possible
                 if alpha >= beta:
                     break
+        #             TODO: remove print
+        # print("Still some other nodes: move({}) value({})".format(best_move, value))
         return best_move, next_node.game_state, value

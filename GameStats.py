@@ -3,18 +3,34 @@ from GameState import GameState
 
 class GameStatsArray:
     def __init__(self):
+        """Collects information from different games and
+        produces statistics"""
         self.game_stats_array = []
 
     def append(self, game_stats):
+        """Adds game stats in one single list"""
         self.game_stats_array.append(game_stats)
 
     def avg_wins(self):
+        """Calculates the percentage of wins for both players
+
+        :returns wins_north: Percentage of wins for North player
+                 wins_south: Percentage of wins for South player"""
         total_matches = len(self.game_stats_array)
-        wins_north = len([el for el in self.game_stats_array if el.result[0] > el.result[1]]) / total_matches * 100
-        wins_south = len([el for el in self.game_stats_array if el.result[0] < el.result[1]]) / total_matches * 100
+        wins_north = len([el for el in self.game_stats_array if el.result[0] > el.result[1]]) \
+                     / total_matches * 100
+        wins_south = len([el for el in self.game_stats_array if el.result[0] < el.result[1]]) \
+                     / total_matches * 100
         return wins_north, wins_south
 
     def avg_swap_stats(self):
+        """Calculates some statistics for swaps:
+            - Percentage of swaps over total matches
+            - Percentage of swaps that lead the player performing it to win over total swaps
+
+        :returns second_player_wins_swap_perc: Percentage of swaps over total matches
+                 avg_swaps_perc: Percentage of swaps that lead the player performing
+                 it to win over total swaps"""
         total_swaps = len([el for el in self.game_stats_array if el.swap])
         second_player_wins_swap = len([el for el in self.game_stats_array if el.swap and (el.result[0] > el.result[1])])
         second_player_wins_swap_perc = 0
@@ -24,22 +40,29 @@ class GameStatsArray:
         return second_player_wins_swap_perc, avg_swaps_perc
 
     def get_avg_nodes_searched(self):
-        return sum(el.avg_nodes_searched for el in self.game_stats_array) / len(self.game_stats_array) * 100
+        """Calculates average of average number of nodes nodes per match"""
+        return sum(el.avg_nodes_searched for el in self.game_stats_array) / len(self.game_stats_array)
+
+    def avg_score_gap(self):
+        """Calculates the average score gap between North and South players"""
+        return sum(abs(abs(el.result[0] - el.result[1])) for el in self.game_stats_array) / self.total_matches
 
     @property
     def total_matches(self):
+        """Returns total number of matches"""
         return len(self.game_stats_array)
 
     def __str__(self):
-        """Get averages"""
+        """Produce a readable string containing all statistics"""
         wins_north, wins_south = self.avg_wins()
         second_player_wins_swap_perc, avg_swaps_perc = self.avg_swap_stats()
         avg_nodes_searched = self.get_avg_nodes_searched()
-        return "Total matches: {}".format(self.total_matches)\
-            + "AVG WINS: NORTH: {:.2f} SOUTH: {:.2f}".format(wins_north, wins_south)\
-            + "AVG North wins with swap on total swaps: {:.2f}".format(second_player_wins_swap_perc)\
-            + "AVG swaps: {:.2f}".format(avg_swaps_perc)\
-            + "AVG nodes searched: {}".format(avg_nodes_searched)
+        return "Total matches: {} \n".format(self.total_matches) \
+               + "AVG WINS: NORTH: {:.2f} SOUTH: {:.2f}\n".format(wins_north, wins_south) \
+               + "AVG North wins with swap on total swaps: {:.2f}\n".format(second_player_wins_swap_perc) \
+               + "AVG swaps: {:.2f}\n".format(avg_swaps_perc) \
+               + "AVG nodes searched: {:.2f}\n".format(avg_nodes_searched) \
+               + "AVG score gap: {:.2f}\n".format(self.avg_score_gap())
 
 
 class GameStats:
@@ -50,7 +73,6 @@ class GameStats:
 
     _previous_game_state: GameState
 
-    # TODO: store the number as an array to do the average
     def __init__(self):
         self.first_move = None
         self.first_turn_player = None
@@ -81,7 +103,8 @@ class GameStats:
 
     def _is_capture_move(self, game_state):
         """
-        Check whether this move is a capture move or not
+        Check whether this move is a capture move or not and update
+        total
         :type game_state: GameState
         """
         player_current = game_state.current_player
@@ -90,13 +113,11 @@ class GameStats:
                                - self._previous_game_state.board[self._previous_game_state._players_score_hole()]
         else:
             score_difference = game_state.board[game_state._players_score_hole()] \
-                - self._previous_game_state.board[self._previous_game_state._opponents_score_hole()]
-        # print("Score difference: {}".format(score_difference))
+                               - self._previous_game_state.board[self._previous_game_state._opponents_score_hole()]
+
         # if it is not a go-again move and the difference in the score between two
-        # states is greater than one seed, then it is capture move
-        # print("Player: curr {} and prev {}".format(player_current, self._previous_game_state.current_player))
+        # states is greater than one seed, then it is a capture move
         if score_difference > 1:
-            # print("Capture performed")
             self.tot_captures[player_current] += 1
             if self.avg_capture_score[player_current] != 0:
                 self.avg_capture_score[player_current] = self.avg_capture_score[player_current] + score_difference / 2
@@ -105,8 +126,13 @@ class GameStats:
 
     def move(self, game_state, index, nodes_searched):
         """
-        Get information from the current move of the player
+        Get information from the current move of the player:
+        - Check whether it is a go-again or a capture
+        - Check if it is the first move
+        - Store the number of nodes searched to calculate best move
 
+        :param nodes_searched: number of nodes searched
+        :param index: index of the hole number considered as the best move
         :type game_state: GameState
         """
 
@@ -125,12 +151,12 @@ class GameStats:
         # of the previous move since the gameState does not keep track of the actual player
         if self._player_in_previous_turn is None:
             self._player_in_previous_turn = player
-            # print("Exiting function")
             return
 
         self._is_capture_move(game_state)
         self._previous_game_state = game_state
 
+        # If it is the same player again, then it's a go-again move
         if self._player_in_previous_turn == player:
             self.tot_go_again_moves[player] += 1
             self._consecutive_move_count += 1
@@ -138,7 +164,7 @@ class GameStats:
             if self.max_go_again_consecutive_moves[player] < self._consecutive_move_count:
                 self.max_go_again_consecutive_moves[player] = self._consecutive_move_count
             self.avg_go_again_consecutive_moves[player] = \
-                    (self.avg_go_again_consecutive_moves[player] + self._consecutive_move_count) / 2
+                (self.avg_go_again_consecutive_moves[player] + self._consecutive_move_count) / 2
             self._consecutive_move_count = 1
             self._player_in_previous_turn = player
 
@@ -147,15 +173,7 @@ class GameStats:
         return self._sum_nodes_searched / self.tot_moves
 
     def __str__(self):
-        result = self.result
-        if self.swap:
-            self.tot_go_again_moves.reverse()
-            self.max_go_again_consecutive_moves.reverse()
-            self.avg_go_again_consecutive_moves.reverse()
-            self.tot_captures.reverse()
-            self.avg_capture_score.reverse()
-            result = (self.result[1], self.result[0])
-            self.result = result
+        """Make the information readable"""
         return "First move: {}\n".format(self.first_move) \
                + "First turn player: {}\n".format(self.first_turn_player) \
                + "Swap needed? {}\n".format(self.swap) \
@@ -167,4 +185,4 @@ class GameStats:
                + ("Avg captured score:" + " {}" * 2 + "\n").format(*self.avg_capture_score) \
                + "Avg nodes searched: {}\n".format(self.avg_nodes_searched) \
                + "Total moves: {}\n".format(self.tot_moves) \
-               + "Result: North {} South {}\n".format(*result)
+               + "Result: North {} South {}\n".format(*self.result)

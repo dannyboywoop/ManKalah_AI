@@ -4,9 +4,10 @@ import random
 from HeuristicComp import HeuristicCompTree
 from GameStats import GameStatsArray
 
+
 def bad_heuristic(game_state, player):
     """arbitrary heuristic, no useful informational content"""
-    return random.randint(1,98)
+    return random.randint(1, 98)
     # return game_state.board[game_state.hole_index(2, player)]
 
 
@@ -30,8 +31,6 @@ def test_heuristic1(game_state, player):
     total_stones_player = 0
     for i in range(1, 7):
         total_stones_player += game_state.board[game_state.hole_index(i, player)]
-
-
 
     return weight1[0] * player_advantage \
            + weight1[1] * close_to_win_player \
@@ -66,46 +65,34 @@ def test_heuristic2(game_state, player):
            + weight2[3] * go_again_holes_num
 
 
-def avg_wins(game_stats_arr):
-    total_matches = len(game_stats_arr)
-    wins_north = len([el for el in game_stats_arr if el.result[0] > el.result[1]]) / total_matches * 100
-    wins_south = len([el for el in game_stats_arr if el.result[0] < el.result[1]]) / total_matches * 100
-    return wins_north, wins_south
-
-
-def avg_second_player_wins_swap(game_stats_arr):
-    total_swaps = len([el for el in game_stats_arr if el.swap])
-    second_player_wins_swap = len([el for el in game_stats_arr if el.swap and (el.result[0] > el.result[1])])
-    second_player_wins_swap_perc = 0
-    if total_swaps != 0:
-        second_player_wins_swap_perc = second_player_wins_swap / total_swaps * 100
-    avg_swaps_perc = total_swaps / len(game_stats_arr) * 100
-    return second_player_wins_swap_perc, avg_swaps_perc
-
-
-def get_avg_nodes_searched(game_stats_arr):
-    return sum(el.avg_nodes_searched for el in game_stats_arr) / len(game_stats_arr) * 100
+def random_weights(self, num_of_weights):
+    weights = []
+    for i in range(num_of_weights):
+        weights.append(random.uniform(-1, 1))
+    return weights
 
 
 # TODO: heuristic functions should accept weight as parameters
 if __name__ == "__main__":
-    weight1 = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
-    weight2 = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
-    for j in range(100):
+    weight1 = [1, 0, 0, 1]
+    weight2 = [1, 0, 0, 0]
+    # weight2 = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
+    # weight2 = [1, 1, -1, 1]
+    for j in range(1):
         game_stats_array = GameStatsArray()
         for i in range(1):
-            tree = HeuristicCompTree(test_heuristic1, test_heuristic2, 4)
+            tree = HeuristicCompTree(test_heuristic1, test_heuristic2, 6)
             tree.run_game()
             game_stats_array.append(tree.game_stats)
 
         """Get average of wins"""
         wins_north, wins_south = game_stats_array.avg_wins()
         print(game_stats_array)
-        if wins_south > wins_north:
-            weight1 = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
-        else:
-            weight2 = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
+        # if wins_south > wins_north:
+        #     weight1 = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
+        # else:
+        #     weight2 = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
 
-    print("FINAL WEIGHTS")
-    print("Weight NORTH: " + "{} ".format(weight1))
-    print("Weight SOUTH: " + "{} ".format(weight2))
+    # print("FINAL WEIGHTS")
+    # print("Weight NORTH: " + "{} ".format(weight1))
+    # print("Weight SOUTH: " + "{} ".format(weight2))

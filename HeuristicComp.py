@@ -4,6 +4,11 @@ from GameState import GameState
 from AlphaBetaAI import AlphaBetaAI
 from GameStats import GameStats
 
+ROW_PADDING = " " * 4
+BOX_TEMPLATE = "[{:2}]"
+ROW_TEMPLATE = ROW_PADDING + (BOX_TEMPLATE * 7)
+SCORE_TEMPLATE = BOX_TEMPLATE + (" " * 28) + BOX_TEMPLATE
+
 class SharedNode:
     """stores a GameState and a dictionary of possible subsequent states
     that can be reached. The value of a shared node and whether it is a max
@@ -58,15 +63,25 @@ class SharedNode:
         player whos turn it is"""
         return self.game_state.current_player == self.root_current_player
 
-    def __str__(self):
-        north_seeds = self.game_state.board[7::-1]
-        south_seeds = self.game_state.board[8:16]
+    def as_row(self, seeds):
+        """Returns seeds as pretty row
 
-        # format data into rows
-        north_row = ("{}  --" + "  {}" * 7).format(*north_seeds)
-        south_row = ("{}  " * 7 + "--  {}").format(*south_seeds)
-        return ""
-        # return "{}\n{}".format(north_row, south_row)
+        Arguments:
+        seeds -- list of 7 integers representing one players seeds
+        """
+        return ROW_TEMPLATE.format(*seeds)
+
+    def __str__(self):
+        north_score, south_score = self.game_state.board[7], self.game_state.board[15]
+        north_seeds = self.game_state.board[6::-1]  # first 7 seeds in reverse order
+        south_seeds = self.game_state.board[8:15]
+
+        # format data into 'pretty' rows
+        north_row = self.as_row(north_seeds)
+        south_row = self.as_row(south_seeds)
+        score_row = SCORE_TEMPLATE.format(north_score, south_score)
+
+        return ("-" * 36 + "\n{}\n{}\n{}\n" + "-" * 36).format(north_row, score_row, south_row)
 
 
 class HeuristicCompTree:
@@ -116,27 +131,27 @@ class HeuristicCompTree:
         # get results
         result = self.root.game_state.scores()
         self.game_stats.result = result
-        # print results
+        # print (result)
         print("Game Over!")
         print("Results: {} {}".format(result[0], result[1]))
-        # print(self.game_stats)
+        print(self.game_stats)
         return result
 
     def make_move(self, index, nodes_searched):
         """moves the root of the tree to the node determined by the move index;
         all nodes no longer in the tree are destroyed."""
         if index == -1:
-            # print("Move: Swap")
+            print("Move: Swap")
             self.game_stats.perform_swap()
         else:
             self.game_stats.move(self.root.game_state, index, nodes_searched)
-            # print("Move: Player {} - {}".format(
-            #     self.root.game_state.current_player, index))
+            print("Move: Player {} - {}".format(
+                self.root.game_state.current_player, index))
 
         self.root.get_children()
         self.root.children[index].make_root()
 
-        # print(self.root)
+        print(self.root)
 
     @property
     def best_move(self):
