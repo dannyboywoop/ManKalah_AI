@@ -5,7 +5,7 @@ from numpy import random
 from collections import defaultdict
 
 from HeuristicFunctions import heuristic_function
-from HeuristicComp import HeuristicCompTree as Game
+from CGame import Game
 
 
 WEIGHT_COUNT = 10
@@ -88,7 +88,7 @@ def play_games(population, num_games):
         choices = np.random.choice(len(population), 2)
         competitors = population[choices]
 
-        winner_index = Game(competitors[0], competitors[1]).run_game()
+        winner_index = Game(competitors[0], competitors[1]).run()
         loser_index = (winner_index + 1) % 2
 
         winner = competitors[winner_index]
@@ -141,15 +141,15 @@ def record_best_performers(best_perfomers):
 
 
 if __name__ == "__main__":
-    pop_count = 5
-    evolution_cyles = 2000
+    pop_count = 100
+    evolution_cyles = 250
     population = population(pop_count)
     for i in range(evolution_cyles):
         print("Evolution number {}".format(i+1))
         population = evolve(
             population,
-            games_factor=1,
-            retain=0.4,
-            random_select=0.2,
+            games_factor=15,
+            retain=0.15,
+            random_select=0.05,
             mutate=0.01
         )
