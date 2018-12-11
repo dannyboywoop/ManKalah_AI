@@ -5,7 +5,7 @@ float heuristic::numPoints(const gameState& state, int player){
     return float(state.scores()[player]);
 }
 
-float heuristic::numGoAgainTurns(const std::array<int, holes>& playerHoles){
+float heuristic::numGoAgainTurns(const std::array<short int, holes>& playerHoles){
     int turnsAvailable{0};
     for(int i=0;i<holes;i++){
         if (playerHoles[i] == (holes - i)) turnsAvailable++;
@@ -13,19 +13,19 @@ float heuristic::numGoAgainTurns(const std::array<int, holes>& playerHoles){
     return float(turnsAvailable);
 }
 
-float heuristic::numStonesOnSide(const std::array<int, holes>& playerHoles){
+float heuristic::numStonesOnSide(const std::array<short int, holes>& playerHoles){
     int total{0};
-    for(const int& h: playerHoles){
+    for(const short int& h: playerHoles){
         total += h;
     }
     return float(total);
 }
 
-float heuristic::emptyHoles(const std::array<int, holes>& playerHoles){
+float heuristic::emptyHoles(const std::array<short int, holes>& playerHoles){
     return float(std::count(playerHoles.begin(),playerHoles.end(),0));
 }
 
-float heuristic::vulnerableHoles(const std::array<int, holes>& playerHoles, const std::array<int, holes>& opponentHoles){
+float heuristic::vulnerableHoles(const std::array<short int, holes>& playerHoles, const std::array<short int, holes>& opponentHoles){
     int vulnerable{0};
     for(int i=0;i<holes;i++){
         if (playerHoles[i] > 0 && opponentHoles[holes-i-1] == 0)
@@ -38,8 +38,8 @@ float heuristic::operator()(const gameState& state, int player){
     // get state properties
     int opponent = state.otherPlayer(player);
     const gameBoard& board = state.getGameBoard();
-    std::array<int,holes> playerHoles;
-    std::array<int,holes> opponentHoles;
+    std::array<short int,holes> playerHoles;
+    std::array<short int,holes> opponentHoles;
     for(int i=0;i<holes;i++){
         playerHoles[i] = board[state.holeIndex(i+1,player)];
         opponentHoles[i] = board[state.holeIndex(i+1,opponent)];

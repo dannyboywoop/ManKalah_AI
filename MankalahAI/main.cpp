@@ -4,7 +4,7 @@
 // entrance point to the program
 int main(int argc, char *argv[]) {
 	uint16_t port = 12346; // default port
-	int maxTreeSearchDepth = 5;
+	int maxTreeSearchDepth = 10;
 	weightList weights = {1,1,0,0,0,0,0,0,0,0};
 
 	// check if exactly one command line argument was entered;

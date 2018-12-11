@@ -9,10 +9,10 @@ typedef std::array<float,10> weightList;
 class heuristic{
 private:
     float numPoints(const gameState&, int);
-    float numGoAgainTurns(const std::array<int, holes>&);
-    float numStonesOnSide(const std::array<int, holes>&);
-    float emptyHoles(const std::array<int, holes>&);
-    float vulnerableHoles(const std::array<int, holes>&, const std::array<int, holes>&);
+    float numGoAgainTurns(const std::array<short int, holes>&);
+    float numStonesOnSide(const std::array<short int, holes>&);
+    float emptyHoles(const std::array<short int, holes>&);
+    float vulnerableHoles(const std::array<short int, holes>&, const std::array<short int, holes>&);
 
     weightList weights;
 public:

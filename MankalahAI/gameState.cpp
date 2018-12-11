@@ -68,19 +68,19 @@ int gameState::holeIndex(int hole, int player) const {
 
 // pass all seeds left on the board to the specified player
 void gameState::giveRemainingSeedsToPlayer(int player) {
-	std::array<int,2> finalScores = scores();
+	std::array<short int,2> finalScores = scores();
 	
 	// count seeds left on board
-	int seedsRemaining = totalSeeds - finalScores[0] - finalScores[1];
+	short int seedsRemaining = short(totalSeeds - finalScores[0] - finalScores[1]);
 	
 	// clear the board of all seeds
-	for (int& hole : board) {
+	for (short int& hole : board) {
 		hole = 0;
 	}
 	
 	// set the scores for each player, givin all remaining seeds to the
 	// specified player
-	board[scoreHoles[player]] = finalScores[player] + seedsRemaining;
+	board[scoreHoles[player]] = short(finalScores[player] + seedsRemaining);
 	board[scoreHoles[otherPlayer(player)]] = finalScores[otherPlayer(player)];
 }
 
@@ -106,7 +106,7 @@ std::set<int> gameState::movesAvailable(int player) const {
 }
 
 // return an array of scores [north's score, south's score]
-std::array<int, 2> gameState::scores() const {
+std::array<short int, 2> gameState::scores() const {
 	return { board[scoreHoles[0]], board[scoreHoles[1]] };
 }
 
@@ -143,14 +143,16 @@ gameState gameState::moveResult(int pos) const {
 	if (holeIndex(1) <= selectedPos && holeIndex(holes) >= selectedPos) {
 		// if so check if it has only 1 seed and the opposite hole is empty
 		int oppositePos = 2 * holes - selectedPos;
-		int seedsInCurrentPos = newState.board[selectedPos];
-		int seedsInOppositePos = newState.board[oppositePos];
+		short int seedsInCurrentPos = newState.board[selectedPos];
+		short int seedsInOppositePos = newState.board[oppositePos];
 		if (seedsInCurrentPos == 1 && seedsInOppositePos > 0) {
 			// if so perform capture
 			performedCapture = true;
 			newState.board[selectedPos] = 0;
 			newState.board[oppositePos] = 0;
-			newState.board[scoreHoles[currentPlayer]] += 1 + seedsInOppositePos;
+			newState.board[scoreHoles[currentPlayer]] = short(
+				newState.board[scoreHoles[currentPlayer]] 
+				+ 1 + seedsInOppositePos);
 		}
 	}
 
