@@ -68,10 +68,7 @@ def mutate_individual(individual):
 
 
 def mutate_weight(weight):
-    if weight < 0.5:
-        new_weight = (1-weight) + random.uniform(-0.5, 0.1)
-    else:
-        new_weight = (1-weight) + random.uniform(-0.1, 0.5)
+    new_weight = weight + random.normal(scale=0.333)
 
     if new_weight < 0:
         new_weight = 0
