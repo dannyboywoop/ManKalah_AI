@@ -72,19 +72,15 @@ def their_empty_holes(game_state: GameState, player: int) -> int:
 
 
 def our_vulnerable_holes(game_state: GameState, player: int) -> int:
-    non_empty_holes = []
-    for hole_index in range(1, 8):
-        board_index = game_state.hole_index(hole_index, player)
-        seed_count = game_state.board[board_index]
-        if seed_count:
-            non_empty_holes.append(hole_index)
-
-    opponent = game_state._other_player(player)
     num_vulnerable_holes = 0
-    for hole_index in non_empty_holes:
-        board_index = game_state.hole_index(hole_index, opponent)
-        seed_count = game_state.board[board_index]
-        if seed_count is 0:
+    opponent = game_state._other_player(player)
+    for hole_index in range(1, 8):
+        our_index = game_state.hole_index(hole_index, player)
+        their_index = game_state.hole_index(8 - hole_index, opponent)
+        
+        we_have_seeds = game_state.board[our_index]
+        they_dont_have_seeds = not game_state.board[their_index]
+        if we_have_seeds and they_dont_have_seeds:
             num_vulnerable_holes += 1
 
     return num_vulnerable_holes
@@ -96,28 +92,26 @@ def their_vulnerable_holes(game_state: GameState, player: int) -> int:
 
 
 heuristic_functions = [
-    our_num_points,
-    their_num_points,
-    num_our_go_again_turns,
-    num_their_go_again_turns,
-    num_stones_our_side,
-    num_stones_their_side,
-    our_empty_holes,
-    their_empty_holes,
-    our_vulnerable_holes,
-    their_vulnerable_holes
+
 ]
 
 
-def heuristic_combinder(functions: list, weights: list):
+def heuristic_combinder(weights: list):
     def output_function(game_state: GameState, player: int) -> int:
-        value = 0
-        for index, function in enumerate(functions):
-            weight = weights[index]
-            value += (weight * function(game_state, player))
-        return value
+        return (
+            our_num_points(game_state, player) * weights[0]
+            - their_num_points(game_state, player) * weights[1]
+            + num_our_go_again_turns(game_state, player) * weights[2]
+            - num_their_go_again_turns(game_state, player) * weights[3]
+            + (((2 * num_stones_our_side(game_state, player)) - 1) * weights[4])
+            + (((2 * num_stones_their_side(game_state, player)) - 1) * weights[5])
+            + (((2 * our_empty_holes(game_state, player)) - 1) * weights[6])
+            + (((2 * their_empty_holes(game_state, player)) - 1) * weights[7])
+            - our_vulnerable_holes(game_state, player) * weights[8]
+            + their_vulnerable_holes(game_state, player) * weights[9]
+        )
     return output_function
 
 
 def heuristic_function(weights: list):
-    return heuristic_combinder(heuristic_functions, weights)
+    return heuristic_combinder(weights)
