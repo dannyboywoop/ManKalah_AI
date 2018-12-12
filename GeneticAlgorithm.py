@@ -49,6 +49,11 @@ def breed_weights(mother_weight, father_weight):
 
     new_weight = random.uniform(min_weight * .95, max_weight * 1.05)
 
+    if new_weight < 0:
+        new_weight = 0
+    elif new_weight > 1:
+        new_weight = 1
+
     return new_weight
 
 
