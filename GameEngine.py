@@ -4,7 +4,7 @@ import sys
 
 from Messages import StartMessage, ChangeMessage, EndMessage, Move
 from GameTree import GameTree
-import TestHeuristics
+from HeuristicFunctions import heuristic_function
 
 
 MESSAGE_TYPES = {
@@ -68,9 +68,10 @@ class GameEngine:
                 self.port = int(sys.argv[1])
 
         # check for heuristic specified as a command line argument
-        if len(sys.argv) == 3:
-            function_module, function_name = sys.argv[2].split(".")
-            heuristic = vars(globals()[function_module])[function_name]
+        if len(sys.argv) == 12:
+            weights = sys.argv[2:13]
+            print(weights)
+            heuristic = heuristic_function(weights)
 
         self.game_tree = GameTree(heuristic)
 
