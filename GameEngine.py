@@ -69,7 +69,7 @@ class GameEngine:
 
         # check for heuristic specified as a command line argument
         if len(sys.argv) == 12:
-            weights = sys.argv[2:13]
+            weights = [float(i) for i in sys.argv[2:13]]
             print(weights)
             heuristic = heuristic_function(weights)
 
