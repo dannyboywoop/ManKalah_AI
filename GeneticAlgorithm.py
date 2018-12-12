@@ -3,6 +3,8 @@ import heapq
 from progressbar import progressbar
 from numpy import random
 from collections import defaultdict
+from multiprocessing import Pool
+from threading import RLock
 
 from HeuristicFunctions import heuristic_function
 from CGame import Game
@@ -82,22 +84,50 @@ def array_to_key(array):
     return ','.join(str(x) for x in array)
 
 
+def play_game(competitors):
+    winner_index = Game(competitors[0], competitors[1]).run()
+    loser_index = (winner_index + 1) % 2
+
+    winner = competitors[winner_index]
+    loser = competitors[loser_index]
+
+    return (winner, loser)
+
+
+def random_pair(population):
+    choices = np.random.choice(len(population), 2)
+    return population[choices]
+
+
 def play_games(population, num_games):
-    scores = defaultdict(int)
-    for game in progressbar(range(num_games)):
-        choices = np.random.choice(len(population), 2)
-        competitors = population[choices]
+    scores = []
 
-        winner_index = Game(competitors[0], competitors[1]).run()
-        loser_index = (winner_index + 1) % 2
+    with Pool(10) as pool:
+        args = [random_pair(population) for _ in range(num_games)]
+        scores = list(
+            progressbar(pool.imap(play_game, args), max_value=num_games)
+        )
 
-        winner = competitors[winner_index]
-        loser = competitors[loser_index]
+    output = {}
 
-        scores[winner.tostring()] += 1
-        scores[loser.tostring()] -= 1
+    for winner, loser in scores:
+        winner_key = winner.tostring()
+        if winner_key not in output:
+            output[winner_key] = [1, 1]
+        else:
+            winner_tuple = output[winner_key]
+            winner_tuple[0] += 1
+            winner_tuple[1] += 1
 
-    return scores
+        loser_key = loser.tostring()
+        if loser_key not in output:
+            output[loser_key] = [-1, 1]
+        else:
+            loser_tuple = output[loser_key]
+            loser_tuple[0] -= 1
+            loser_tuple[1] += 1
+
+    return output
 
 
 def evolve(population, games_factor=2, retain=.2, random_select=.1, mutate=.1):
@@ -110,7 +140,7 @@ def evolve(population, games_factor=2, retain=.2, random_select=.1, mutate=.1):
     bottom_scorers_size = population_size - top_scorers_size
     random_select_size = int(population_size * random_select)
 
-    score = scores.get
+    def score(key): return scores.get(key)[0] / scores.get(key)[1]
     best_perfomers = heapq.nlargest(top_scorers_size, scores, key=score)
     best_perfomers = np.array([np.fromstring(x) for x in best_perfomers])
 
