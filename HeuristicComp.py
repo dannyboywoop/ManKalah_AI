@@ -2,12 +2,14 @@
 import copy
 from GameState import GameState
 from AlphaBetaAI import AlphaBetaAI
+from HeuristicFunctions import heuristic_function
 
 
 class SharedNode:
     """stores a GameState and a dictionary of possible subsequent states
     that can be reached. The value of a shared node and whether it is a max
     node varies depending on the player who owns the root node of the tree"""
+
     def __init__(self, game_state, tree=None):
         self.game_state = game_state
         self.children = {}
@@ -74,11 +76,15 @@ class SharedNode:
 class HeuristicCompTree:
     """class for storing a game tree shared by both players
     with methods making decisions for both players based on the tree"""
-    def __init__(self, north_heuristic, south_heuristic):
+
+    def __init__(self, north_weights, south_weights, depth=4):
         self.root = None
         self.nodes_in_memory = 0
-        self.ai = AlphaBetaAI(5)
-        self.heuristics = [north_heuristic, south_heuristic]
+        self.ai = AlphaBetaAI(depth)
+        self.heuristics = [
+            heuristic_function(north_weights),
+            heuristic_function(south_weights)
+        ]
         self._calculate_initial_tree()
 
     def _calculate_initial_tree(self):
@@ -92,7 +98,7 @@ class HeuristicCompTree:
         init_state = GameState()
         root = SharedNode(init_state, self)
         self.root = root
-        print(root)
+        # print(root)
 
         # for all initial moves
         for child in self.root.get_children().values():
@@ -116,28 +122,34 @@ class HeuristicCompTree:
         result = self.root.game_state.scores()
 
         # print results
-        print("Game Over!")
-        print("Results: {} {}".format(result[0], result[1]))
-        return result
+        # print("Game Over!")
+        # print("Results: {} {}".format(result[0], result[1]))
+
+        if result[0] > result[1]:
+            winner = 0
+        else:
+            winner = 1
+
+        return winner
 
     def make_move(self, index):
         """moves the root of the tree to the node determined by the move index;
         all nodes no longer in the tree are destroyed."""
-        if index == -1:
-            print("Move: Swap")
-        else:
-            print("Move: Player {} - {}".format(
-                self.root.game_state.current_player, index))
+        # if index == -1:
+        #     # print("Move: Swap")
+        # else:
+        #     # print("Move: Player {} - {}".format(
+        #         self.root.game_state.current_player, index))
 
         self.root.get_children()
         self.root.children[index].make_root()
 
-        print(self.root)
+        # print(self.root)
 
     @property
     def best_move(self):
         """searches for and returns the best move available from
         the root node of the tree"""
         move, _, _ = self.ai.choose_move(self)
-        print("{} SharedNode(s) in memory".format(self.nodes_in_memory))
+        # print("{} SharedNode(s) in memory".format(self.nodes_in_memory))
         return move
