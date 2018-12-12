@@ -171,15 +171,15 @@ def record_best_performers(best_perfomers):
 
 
 if __name__ == "__main__":
-    pop_count = 100
+    pop_count = 50
     evolution_cyles = 250
     population = population(pop_count)
     for i in range(evolution_cyles):
         print("Evolution number {}".format(i+1))
         population = evolve(
             population,
-            games_factor=15,
-            retain=0.15,
+            games_factor=36,
+            retain=0.2,
             random_select=0.05,
-            mutate=0.01
+            mutate=0.1
         )
