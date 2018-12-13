@@ -1,6 +1,6 @@
 // header guard
-#ifndef GAME_ENGINE_H
-#define GAME_ENGINE_H
+#ifndef TCP_GAME_ENGINE_H
+#define TCP_GAME_ENGINE_H
 
 #include "message.h"
 #include "gameTree.h"
@@ -8,7 +8,7 @@
 #include <vector>
 #include <memory>
 
-class gameEngine{
+class TCPGameEngine{
 private:
 	int listening;
 	sockaddr_in client;
@@ -34,8 +34,8 @@ private:
 	std::unique_ptr<message> parseMessage(std::string);
 
 public:
-	gameEngine(int maxTreeDepth, uint16_t port, weightList weights);
-    ~gameEngine();
+	TCPGameEngine(int maxTreeDepth, uint16_t port, weightList weights);
+    ~TCPGameEngine();
     
 	void run();
 };

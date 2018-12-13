@@ -1,4 +1,4 @@
-#include "gameEngine.h"
+#include "TCPGameEngine.h"
 #include "message.h"
 #include <iostream>
 #include <sys/types.h>
@@ -11,7 +11,7 @@
 #include <algorithm>
 
 // create the listening socket
-void gameEngine::createSocket(){
+void TCPGameEngine::createSocket(){
 	listening = socket(AF_INET, SOCK_STREAM, 0);
 	if (listening == -1) {
 		throw std::string("Error: Failed to create socket!");
@@ -19,7 +19,7 @@ void gameEngine::createSocket(){
 }
 
 // bind the socket to a port/IP
-void gameEngine::bindSocket(uint16_t port){
+void TCPGameEngine::bindSocket(uint16_t port){
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(port);
@@ -31,14 +31,14 @@ void gameEngine::bindSocket(uint16_t port){
 }
 
 // mark socket for listening (you could have read the method name on this one)
-void gameEngine::markSocketForListening(int maxClients /*= 1*/){
+void TCPGameEngine::markSocketForListening(int maxClients /*= 1*/){
 	if (listen(listening, maxClients) == -1) {
 		throw std::string("Error: Listen failed!");
 	}
 }
 
 // accept connection from client (ManKalah.jar)
-void gameEngine::acceptCall(){
+void TCPGameEngine::acceptCall(){
 
 	clientSocket = accept(listening,
 		(sockaddr*)&client, &clientSize);
@@ -54,7 +54,7 @@ void gameEngine::acceptCall(){
 }
 
 // read socket info into buffer
-int gameEngine::receiveData(char (&buff)[1024]){
+int TCPGameEngine::receiveData(char (&buff)[1024]){
 	// clear the buffer
 	memset(buff, 0, 1024);
 
@@ -69,7 +69,7 @@ int gameEngine::receiveData(char (&buff)[1024]){
 }
 
 // convert a string into a message object
-std::unique_ptr<message> gameEngine::parseMessage(std::string mess){
+std::unique_ptr<message> TCPGameEngine::parseMessage(std::string mess){
 	// if message is a start message
     if (mess[0] == 'S') 
 		return std::unique_ptr<message>(
@@ -90,7 +90,7 @@ std::unique_ptr<message> gameEngine::parseMessage(std::string mess){
 }
 
 // get all messages from buffer (parsed into message objects)
-std::vector<std::unique_ptr<message>> gameEngine::parseDataToMessages(
+std::vector<std::unique_ptr<message>> TCPGameEngine::parseDataToMessages(
 	const char (&buff)[1024], int size){
 	
 	// stores messages
@@ -117,7 +117,7 @@ std::vector<std::unique_ptr<message>> gameEngine::parseDataToMessages(
 }
 
 // play the game
-void gameEngine::run(){
+void TCPGameEngine::run(){
 	char buf[1024];
 	std::vector<std::unique_ptr<message>> messages;
 	while (true) {
@@ -147,7 +147,7 @@ void gameEngine::run(){
 }
 
 // calculates and sends the best available move
-void gameEngine::sendBestMove(){
+void TCPGameEngine::sendBestMove(){
 	
 	// get the best move from gameTree
 	int bestMove = tree.getBestMove();
@@ -166,8 +166,8 @@ void gameEngine::sendBestMove(){
 	send(clientSocket, moveMessage.c_str(), moveMessage.size(), 0);
 }
 
-// gameEngine constructor
-gameEngine::gameEngine(int maxTreeDepth, uint16_t port, weightList weights): tree(maxTreeDepth, weights) {
+// TCPGameEngine constructor
+TCPGameEngine::TCPGameEngine(int maxTreeDepth, uint16_t port, weightList weights): tree(maxTreeDepth, weights) {
 	// create a socket
 	createSocket();
 
@@ -181,7 +181,7 @@ gameEngine::gameEngine(int maxTreeDepth, uint16_t port, weightList weights): tre
 	acceptCall();
 }
 
-gameEngine::~gameEngine(){
+TCPGameEngine::~TCPGameEngine(){
 	// close socket
 	close(clientSocket);
 }
