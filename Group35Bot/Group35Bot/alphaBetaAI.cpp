@@ -19,9 +19,11 @@ int alphaBetaAI::chooseMove(gameTree& tree) {
 	// find best move
 	move bestMove = evalualate(*tree.root, maxDepth, -inf, inf);
 
+#ifdef TCP_VERSION
 	// print nodes checked in process
-	//std::cout << "Searching for best move: " << nodesChecked
-	//	<< " node(s) checked" << std::endl;
+	std::cout << "Searching for best move: " << nodesChecked
+		<< " node(s) checked" << std::endl;
+#endif
 
 	// return best move
 	return bestMove.index;

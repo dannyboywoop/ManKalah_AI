@@ -32,11 +32,9 @@ void gameEngine::sendBestMove() {
 	std::string moveMessage;
 	if (bestMove == -1) {
 		moveMessage = "SWAP";
-		//std::cout << "Performed Swap!" << std::endl;
 	}
 	else {
 		moveMessage = "MOVE;" + std::to_string(bestMove);
-		//std::cout << "Made move: " << bestMove << std::endl;
 	}
 
 	// send move message 
