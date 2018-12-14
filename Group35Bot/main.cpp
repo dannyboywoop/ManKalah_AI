@@ -4,8 +4,19 @@
 
 // entrance point to the program
 int main(int argc, char *argv[]) {
-	int maxTreeSearchDepth = 9;
-	weightList weights = { 1,1,0,0,0,0,0,0,0,0 };
+	int maxTreeSearchDepth = 10;
+	weightList weights = { 
+		0.94411071f,
+		1.0f,
+		0.93632376f,
+		0.70470548f,
+		0.11684469f,
+		0.01519149f,
+		0.04276269f,
+		0.16460274f,
+		0.39338962f,
+		0.08789862f 
+	};
 
 	// check if exactly one command line argument was entered
 	if (argc == 2) {
