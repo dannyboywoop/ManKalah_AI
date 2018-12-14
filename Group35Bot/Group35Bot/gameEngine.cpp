@@ -32,6 +32,7 @@ void gameEngine::sendBestMove() {
 	std::string moveMessage;
 	if (bestMove == -1) {
 		moveMessage = "SWAP";
+		tree.makeMove(-1);
 	}
 	else {
 		moveMessage = "MOVE;" + std::to_string(bestMove);

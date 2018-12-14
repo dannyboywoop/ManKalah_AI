@@ -156,6 +156,7 @@ void TCPGameEngine::sendBestMove(){
 	std::string moveMessage;
 	if (bestMove == -1){
 		moveMessage = "SWAP\n";
+		tree.makeMove(-1);
 		std::cout << "Performed Swap!" << std::endl;
 	}else{
 		moveMessage = "MOVE;" + std::to_string(bestMove) + '\n';
