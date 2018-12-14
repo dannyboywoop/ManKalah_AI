@@ -10,7 +10,7 @@ void startMessage::printFormatted() const {
     // rawMessage == "START;[team]"
     std::cout<<"Match started: We are "<<rawMessage.substr(6)<<std::endl;
 }
-void startMessage::performMessageAction(gameTree& tree) const {
+bool startMessage::performMessageAction(gameTree& tree) const {
     // team name starts at position 6
     std::string playerName = rawMessage.substr(6);
     int playerNum;
@@ -22,6 +22,9 @@ void startMessage::performMessageAction(gameTree& tree) const {
 
     // initialize game tree
     tree.generateInitialTree(playerNum);
+
+	// continue game
+	return true;
 }
 
 // change message methods
@@ -29,7 +32,7 @@ changeMessage::changeMessage(std::string text) : message(text) {}
 void changeMessage::printFormatted() const {
     std::cout<<rawMessage<<std::endl;
 }
-void changeMessage::performMessageAction(gameTree& tree) const {
+bool changeMessage::performMessageAction(gameTree& tree) const {
     // rawMessage == 
     // CHANGE;[SWAP or index];n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n;[YOU or OPP]
 
@@ -47,6 +50,9 @@ void changeMessage::performMessageAction(gameTree& tree) const {
 
     // update tree based on move made
     tree.makeMove(move);
+
+	// continue game
+	return true;
 }
 
 // end message methods
@@ -54,6 +60,7 @@ endMessage::endMessage(std::string text) : message(text) {}
 void endMessage::printFormatted() const {
     std::cout << "Game Over!" << std::endl;
 }
-void endMessage::performMessageAction(gameTree& tree) const {
-    // do nothing, the game's over!
+bool endMessage::performMessageAction(gameTree& tree) const {
+    // end the game
+	return false;
 }
