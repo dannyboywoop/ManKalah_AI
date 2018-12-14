@@ -9,6 +9,8 @@ from threading import RLock
 from HeuristicFunctions import heuristic_function
 from CGame import Game
 
+# This genetic algorithm has been developed from the article:
+# https://towardsdatascience.com/genetic-programming-for-ai-heuristic-optimization-9d7fdb115ee1
 
 WEIGHT_COUNT = 10
 
