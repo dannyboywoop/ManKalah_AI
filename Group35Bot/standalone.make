@@ -12,7 +12,7 @@ $(ODIR)/%.o: %.cpp $(DEPS)
 	mkdir -p $(ODIR)
 	$(CC) -c -x c++ $< -g1 -o $@ $(CPPFLAGS)
 
-$(BDIR)/MankalahAI.out: $(OBJ)
+$(BDIR)/Group35AI.out: $(OBJ)
 	mkdir -p $(BDIR)
 	$(CC) -o $@ $(LDFLAGS) $^ -static
 
@@ -20,5 +20,5 @@ clean:
 	rm -f $(ODIR)/*.o
 	rm -f $(BDIR)/*.out
 
-rebuild: clean $(BDIR)/MankalahAI.out
+rebuild: clean $(BDIR)/Group35AI.out
 	# clean then build
