@@ -20,5 +20,5 @@ clean:
 	rm -f $(ODIR)/*.o
 	rm -f $(BDIR)/*.out
 
-rebuild: clean $(BDIR)/MankalahAI.out
+rebuild: clean $(BDIR)/TCPMankalahAI.out
 	# clean then build
