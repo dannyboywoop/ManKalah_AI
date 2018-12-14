@@ -12,7 +12,7 @@ $(ODIR)/%.o: %.cpp $(DEPS)
 	mkdir -p $(ODIR)
 	$(CC) -c -x c++ $< -g1 -o $@ $(CPPFLAGS)
 
-$(BDIR)/MankalahAI.out: $(OBJ)
+$(BDIR)/TCPMankalahAI.out: $(OBJ)
 	mkdir -p $(BDIR)
 	$(CC) -o $@ $(LDFLAGS) $^
 
