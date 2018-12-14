@@ -5,6 +5,7 @@ from numpy import random
 from collections import defaultdict
 from multiprocessing import Pool
 from threading import RLock
+from itertools import permutations
 
 from HeuristicFunctions import heuristic_function
 from CGame import Game
@@ -104,48 +105,37 @@ def random_pair(population):
     return population[choices]
 
 
-def play_games(population, num_games):
+def play_games(population):
     scores = []
 
-    with Pool(10) as pool:
-        args = [random_pair(population) for _ in range(num_games)]
+    with Pool(100) as pool:
+        args = list(permutations(population, r=2))
         scores = list(
-            progressbar(pool.imap(play_game, args), max_value=num_games)
+            progressbar(pool.imap(play_game, args), max_value=len(args))
         )
 
-    output = {}
+    output = defaultdict(int)
 
     for winner, loser in scores:
         winner_key = winner.tostring()
-        if winner_key not in output:
-            output[winner_key] = [1, 1]
-        else:
-            winner_tuple = output[winner_key]
-            winner_tuple[0] += 1
-            winner_tuple[1] += 1
-
         loser_key = loser.tostring()
-        if loser_key not in output:
-            output[loser_key] = [-1, 1]
-        else:
-            loser_tuple = output[loser_key]
-            loser_tuple[0] -= 1
-            loser_tuple[1] += 1
+
+        output[winner_key] += 1
+        output[loser_key] -= 1
 
     return output
 
 
-def evolve(population, games_factor=2, retain=.2, random_select=.1, mutate=.1):
+def evolve(population, retain=.2, random_select=.1, mutate=.1):
     population_size = len(population)
-    num_games = population_size * games_factor
 
-    scores = play_games(population, num_games)
+    scores = play_games(population)
 
     top_scorers_size = int(retain * population_size)
     bottom_scorers_size = population_size - top_scorers_size
     random_select_size = int(population_size * random_select)
 
-    def score(key): return scores.get(key)[0] / scores.get(key)[1]
+    score = scores.get
     best_perfomers = heapq.nlargest(top_scorers_size, scores, key=score)
     best_perfomers = np.array([np.fromstring(x) for x in best_perfomers])
 
@@ -183,7 +173,6 @@ if __name__ == "__main__":
         print("Evolution number {}".format(i+1))
         population = evolve(
             population,
-            games_factor=36,
             retain=0.2,
             random_select=0.05,
             mutate=0.1
