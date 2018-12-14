@@ -59,7 +59,9 @@ void gameTree::generateInitialTree(int ourPlayer) {
 	// create root node
 	gameState initialState;
 	root = std::unique_ptr<node>(new node(initialState, ourPlayer, *this));
+#ifdef TCP_VERSION
 	std::cout << initialState << std::endl;
+#endif
 
 	// for all initial moves
 	for (const std::pair<const int, std::unique_ptr<node>>& child :
@@ -85,8 +87,10 @@ void gameTree::makeMove(int index) {
 	// change root to relevant child
 	root = std::move(root->children[index]);
 
+#ifdef TCP_VERSION
 	// print new game state
 	std::cout << root->state << std::endl;
+#endif
 }
 
 // returns whether the root node contains a state where it is our turn
@@ -97,6 +101,8 @@ bool gameTree::isOurTurn() const {
 // calculate and return the index of the best move available to us
 int gameTree::getBestMove() {
 	int bestMove = ai.chooseMove(*this);
+#ifdef TCP_VERSION
 	std::cout << nodesInMemory << " node(s) in memory" << std::endl;
+#endif
 	return bestMove;
 }

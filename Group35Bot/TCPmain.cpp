@@ -1,4 +1,4 @@
-#include "gameEngine.h"
+#include "TCPGameEngine.h"
 #include "heuristic.h"
 
 // entrance point to the program
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
 	// create a game engine that searches to the maximum depth specified
 	// listening to the port number specified
-	gameEngine engine(maxTreeSearchDepth, port, weights);
+	TCPGameEngine engine(maxTreeSearchDepth, port, weights);
 	engine.run();	
 
 	return 0;
