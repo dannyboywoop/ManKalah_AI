@@ -1,3 +1,4 @@
+// includes
 #include "alphaBetaAI.h"
 #include "gameTree.h"
 #include <iostream>
@@ -8,7 +9,7 @@
 move::move() :index(0), value(0) {}
 move::move(int index, float value) :index(index), value(value) {}
 
-// alphaBetaAi constructors
+// alphaBetaAI constructor
 alphaBetaAI::alphaBetaAI(int maxDepth) :maxDepth(maxDepth), nodesChecked(0) {}
 
 // calulates and returns the best available move
@@ -19,6 +20,7 @@ int alphaBetaAI::chooseMove(gameTree& tree) {
 	// find best move
 	move bestMove = evalualate(*tree.root, maxDepth, -inf, inf);
 
+// print the number of nodes checked in the search if the TCP version built
 #ifdef TCP_VERSION
 	// print nodes checked in process
 	std::cout << "Searching for best move: " << nodesChecked
@@ -29,12 +31,14 @@ int alphaBetaAI::chooseMove(gameTree& tree) {
 	return bestMove.index;
 }
 
+// evaluates a given node
 move alphaBetaAI::evalualate(
 	node& currentNode, int depthToSearch, float alpha, float beta) {
+
 	// increment number of nodes checked
 	nodesChecked++;
 
-	move bestMove;
+	move bestMove; // stores best move available
 
 	// if bottom of searchable tree, return node value
 	if (depthToSearch == 0 || currentNode.isTerminal()) {
@@ -43,7 +47,8 @@ move alphaBetaAI::evalualate(
 	}
 
 	// get children of current node
-	const std::map<int, std::unique_ptr<node>>& children = currentNode.getChildren();
+	const std::map<int, std::unique_ptr<node>>& children 
+		= currentNode.getChildren();
 
 	// if the current node is a max node
 	if (currentNode.isMaxNode()) {
@@ -96,5 +101,6 @@ move alphaBetaAI::evalualate(
 		}
 	}
 	
+	// return the best move available
 	return bestMove;
 }
