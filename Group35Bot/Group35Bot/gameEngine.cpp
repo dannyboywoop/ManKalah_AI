@@ -31,7 +31,7 @@ void gameEngine::sendBestMove() {
 	// convert the move index to a move message
 	std::string moveMessage;
 	if (bestMove == -1) {
-		moveMessage = "SWAP\n";
+		moveMessage = "SWAP";
 		//std::cout << "Performed Swap!" << std::endl;
 	}
 	else {
