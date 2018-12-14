@@ -14,7 +14,7 @@ $(ODIR)/%.o: %.cpp $(DEPS)
 
 $(BDIR)/MankalahAI.out: $(OBJ)
 	mkdir -p $(BDIR)
-	$(CC) -o $@ $(LDFLAGS) $^
+	$(CC) -o $@ $(LDFLAGS) $^ -static
 
 clean:
 	rm -f $(ODIR)/*.o
