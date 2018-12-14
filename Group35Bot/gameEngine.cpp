@@ -1,3 +1,4 @@
+// includes
 #include "gameEngine.h"
 #include <string>
 
@@ -32,6 +33,7 @@ void gameEngine::sendBestMove() {
 	std::string moveMessage;
 	if (bestMove == -1) {
 		moveMessage = "SWAP";
+		// update tree root
 		tree.makeMove(-1);
 	}
 	else {
