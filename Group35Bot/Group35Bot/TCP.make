@@ -9,9 +9,11 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 .PHONY: clean rebuild
 
 $(ODIR)/%.o: %.cpp $(DEPS)
+	mkdir -p $(ODIR)
 	$(CC) -c -x c++ $< -g1 -o $@ $(CPPFLAGS)
 
 $(BDIR)/MankalahAI.out: $(OBJ)
+	mkdir -p $(BDIR)
 	$(CC) -o $@ $(LDFLAGS) $^
 
 clean:
