@@ -5,6 +5,7 @@ Repository for COMP34120:AI and GAMES - Project 1
 ## Introduction
 
 In this project we have produced an AI bot that can play 7,7 ManKalah. Our main aims were to produce a bot that would make decisions quickly and have a high rate of success when played against other bots.
+**Note:**All files within the *Project Spec* path, including the game engine, were provided to us at the start of the project. This is not our work!
 
 ## Approach
 
