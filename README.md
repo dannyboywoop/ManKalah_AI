@@ -50,10 +50,10 @@ You can clean or rebuild by adding the relevant argument:
 ## Playing the game
 
 To play the standalone version, run ManKalah.jar with the following argument:
-```java -jar ManKalah.jar "other agent" "./MankalahAI.out"```
+```java -jar ManKalah.jar "other agent" "./Group35AI.out"```
 
 For the standalone version you can add a single command line argument that specifies the maximum depth to search the game tree:
-```./MankalahAI.out 12```
+```./Group35AI.out 12```
 
 For the TCP version, you should run this first in a seperate terminal:
 ```./TCPMankalahAI.out```
@@ -67,7 +67,7 @@ You can also enter 10 command line arguments (instead of or after those previous
 
 ## HeuristicCompTree
 The HeuristicCompTree class has been added (along with SharedNode) to make it easier and faster to play two of our bots against each other, with different heuristic functions, to determine a winner. 
-Instead of having to run two seperate bots each calculating the game tree and communicating with the server, a single game tree is created and it calculates the best moves for each of the players depending on their heuristic functions.
+Instead of having to run two seperate bots each calculating the game tree and communicating with the engine, a single game tree is created and it calculates the best moves for each of the players depending on their heuristic functions.
 
 ## Genetic Algorithm
 
